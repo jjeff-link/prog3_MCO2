@@ -162,6 +162,7 @@ public class tempCtr implements ActionListener, DocumentListener, ItemListener {
 
         hotelSystem.addRoom(hotel, roomCount, roomTypeChoice);
         updateCbRmToAdd();
+        updateCbRooms();
     }
 
     public void removeRoom(){

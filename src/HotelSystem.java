@@ -1,3 +1,4 @@
+import java.lang.reflect.Executable;
 import java.util.ArrayList;
 
 /** Represents a Hotel System
@@ -60,31 +61,26 @@ public class HotelSystem {
      * @param hotel specific hotel where a new room is made
      * @return name of room
      */
-    public String assignRoomName(Hotel hotel){
-        int currRooms = hotel.getRooms().size(); //gets current number of rooms in hotel
-        if(inRange(currRooms, 0, 9)){ //if current size is below 10
-            if(currRooms == 9)
-                return "Rm" + 1 + (currRooms + 1);
-            return "Rm" + 10 + (currRooms + 1); //symbolizes first floor
+    public String assignRoomName(Hotel hotel, int roomType) {
+        int currStandard = 0;
+        int currDeluxe = 0;
+        int currExecutive = 0;
+
+        for (Room room : hotel.getRooms()) {
+            if (room instanceof Standard)
+                currStandard++;
+            if (room instanceof Deluxe)
+                currDeluxe++;
+            if (room instanceof Executive)
+                currExecutive++;
         }
-        if(inRange(currRooms, 10, 19)){ //if current size is from 10 to 19
-            if(currRooms == 19)
-                return "Rm" + 2 + (currRooms - 10 + 1);
-            return "Rm" + 20 + (currRooms - 10 + 1); //symbolizes second floor
-        }
-        if(inRange(currRooms, 20, 29)){ //if current size is from 20 to 29
-            if(currRooms == 29)
-                return "Rm" + 3 + (currRooms - 20 + 1);
-            return "Rm" + 30 + (currRooms - 20 + 1); //symbolizes third floor
-        }
-        if(inRange(currRooms, 30, 39)){ //if current size is from 30 to 29
-            if(currRooms == 39)
-                return "Rm" + 3 + (currRooms - 30 + 1);
-            return "Rm" + 40 + (currRooms - 30 + 1); //symbolizes fourth floor
-        }                                             //if current size is from 40 to 50
-        if(currRooms == 49)
-            return "Rm" + 5 + (currRooms - 40 + 1);
-        return "Rm" + 50 + (currRooms - 40 + 1);    //symbolizes fifth floor
+
+        if (roomType == 1)
+            return "S" + (currStandard + 1);
+        if (roomType == 2)
+            return "D" + (currDeluxe + 1);
+        return "E" + (currExecutive + 1);
+
     }
 
     /**
@@ -201,15 +197,15 @@ public class HotelSystem {
         else {
             for (i = 0; i < nRooms; i++) {
                 if(roomType == 1) {
-                    Standard room = new Standard(assignRoomName(hotel)); //calls assignRoomName to find name to the new room
+                    Standard room = new Standard(assignRoomName(hotel, 1)); //calls assignRoomName to find name to the new room
                     hotel.getRooms().add(room);
                 }
                 else if (roomType == 2) {
-                    Deluxe room = new Deluxe(assignRoomName(hotel));
+                    Deluxe room = new Deluxe(assignRoomName(hotel, 2));
                     hotel.getRooms().add(room);
                 }
                 else{
-                    Executive room = new Executive(assignRoomName(hotel));
+                    Executive room = new Executive(assignRoomName(hotel, 3));
                     hotel.getRooms().add(room);
                 }
             }
