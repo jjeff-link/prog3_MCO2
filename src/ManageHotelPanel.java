@@ -2,6 +2,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemListener;
 
 public class ManageHotelPanel extends JPanel {
     private JPanel managePanel = new JPanel();
@@ -28,18 +29,21 @@ public class ManageHotelPanel extends JPanel {
     private JButton changeBtn;
     private JTextField tfNewName;
 
-    private JComboBox<String> cbRoomType;
+    private JComboBox<String> cbRoomTypeAdd;
     private JComboBox<Integer> cbRmToAdd;
     private JButton confirmAddBtn;
 
+    private JComboBox<String> cbRoomTypeRemove;
     private JComboBox<Integer> cbRmToRemove;
+    private JButton selectRoomRemoveBtn;
     private JButton confirmRemoveBtn;
 
 
     private JTextField tfNewPrice;
     private JButton confirmPriceBtn;
 
-    private JComboBox<Integer> cbDateMod;
+    private JComboBox<Integer> cbStartDateMod;
+    private JComboBox<Integer> cbEndDateMod;
     private JTextField tfNewPriceMod;
     private JButton confirmPriceModBtn;
 
@@ -58,13 +62,21 @@ public class ManageHotelPanel extends JPanel {
 
     public void init() {
         String[] roomTypes = {"Standard", "Deluxe", "Executive"};
-        Integer[] dateList = new Integer[30];
-        for(int i = 1; i <= 30; i++)
-            dateList[i-1] = i;
-        cbRoomType = new JComboBox<String>(roomTypes);
+        Integer[] startDateList = new Integer[30];
+        Integer[] endDateList = new Integer[30];
+        for(int i = 1; i <= 31; i++) {
+            if (i > 1)
+                endDateList[i - 2] = i;
+            if(i < 31)
+                startDateList[i - 1] = i;
+        }
+        cbRoomTypeAdd = new JComboBox<String>(roomTypes);
+        cbRoomTypeRemove = new JComboBox<String>(roomTypes);
         cbRmToAdd = new JComboBox<Integer>();
         cbRmToRemove = new JComboBox<Integer>();
-        cbDateMod = new JComboBox<Integer>(dateList);
+        cbStartDateMod = new JComboBox<Integer>(startDateList);
+        cbEndDateMod = new JComboBox<>(endDateList);
+        cbEndDateMod.addItem(31);
 
         JLabel lblManageHotel = new JLabel("Manage Hotel");
         this.add(lblManageHotel, BorderLayout.NORTH);
@@ -151,7 +163,7 @@ public class ManageHotelPanel extends JPanel {
         roomTypePanel.setLayout(new FlowLayout());
         JLabel lblRoomType = new JLabel("Select Room Type");
         roomTypePanel.add(lblRoomType);
-        roomTypePanel.add(cbRoomType);
+        roomTypePanel.add(cbRoomTypeAdd);
         panel.add(roomTypePanel);
 
         //roomCount
@@ -176,9 +188,18 @@ public class ManageHotelPanel extends JPanel {
         panel.add(lblRemoveRoom);
 
 
-        //roomCount
+        //roomType
+        JPanel roomTypePanel = new JPanel();
+        roomTypePanel.setLayout(new FlowLayout());
+        JLabel lblRoomType = new JLabel("Room Type to Remove: ");
+        roomTypePanel.add(lblRoomType);
+        roomTypePanel.add(cbRoomTypeRemove);
+        selectRoomRemoveBtn = new JButton("Select Room Type");
+        roomTypePanel.add(selectRoomRemoveBtn);
+        panel.add(roomTypePanel);
+
+        //room count
         JPanel roomCountPanel = new JPanel();
-        roomCountPanel.setLayout(new FlowLayout());
         JLabel lblRoomName = new JLabel("Select Number of Rooms to Remove");
         roomCountPanel.add(lblRoomName);
         roomCountPanel.add(cbRmToRemove);
@@ -203,7 +224,7 @@ public class ManageHotelPanel extends JPanel {
         promptPanel.add(lblNewPrice);
         tfNewPrice = new JTextField(10);
         promptPanel.add(tfNewPrice);
-        confirmPriceBtn = new JButton("Confirm Update");
+        confirmPriceBtn = new JButton("Confirm Base Price");
         promptPanel.add(confirmPriceBtn);
 
         panel.add(promptPanel);
@@ -221,9 +242,12 @@ public class ManageHotelPanel extends JPanel {
         //date Panel
         JPanel datePanel = new JPanel();
         datePanel.setLayout(new FlowLayout());
-        JLabel lblDatePrompt = new JLabel("Select Date: ");
-        datePanel.add(lblDatePrompt);
-        datePanel.add(cbDateMod);
+        JLabel lblStartDatePrompt = new JLabel("Enter Start Date: ");
+        datePanel.add(lblStartDatePrompt);
+        datePanel.add(cbStartDateMod);
+        JLabel lblEndDatePrompt = new JLabel("Enter End Date: ");
+        datePanel.add(lblEndDatePrompt);
+        datePanel.add(cbEndDateMod);
         panel.add(datePanel);
 
         //price Panel
@@ -233,7 +257,7 @@ public class ManageHotelPanel extends JPanel {
         pricePanel.add(lblNewPrice);
         tfNewPriceMod = new JTextField(3);
         pricePanel.add(tfNewPriceMod);
-        confirmPriceModBtn = new JButton("Confirm New Price Modifier");
+        confirmPriceModBtn = new JButton("Confirm Price Modifier");
         pricePanel.add(confirmPriceModBtn);
         panel.add(pricePanel);
 
@@ -291,15 +315,18 @@ public class ManageHotelPanel extends JPanel {
         removeHotelOptBtn.addActionListener(actionListener);
 
         changeBtn.addActionListener(actionListener);
-        cbRoomType.addActionListener(actionListener);
+        cbRoomTypeAdd.addActionListener(actionListener);
         cbRmToAdd.addActionListener(actionListener);
         confirmAddBtn.addActionListener(actionListener);
 
+        cbRoomTypeRemove.addActionListener(actionListener);
         cbRmToRemove.addActionListener(actionListener);
+        selectRoomRemoveBtn.addActionListener(actionListener);
         confirmRemoveBtn.addActionListener(actionListener);
 
         confirmPriceBtn.addActionListener(actionListener);
-        cbDateMod.addActionListener(actionListener);
+        cbStartDateMod.addActionListener(actionListener);
+        cbEndDateMod.addActionListener(actionListener);
         confirmPriceModBtn.addActionListener(actionListener);
 
         searchRsrvBtn.addActionListener(actionListener);
@@ -315,9 +342,21 @@ public class ManageHotelPanel extends JPanel {
         tfNewPriceMod.getDocument().addDocumentListener(documentListener);
         tfGuestName.getDocument().addDocumentListener(documentListener);
     }
-    public String getNewName(){
+
+    public void setItemListener(ItemListener itemListener) {
+        cbRoomTypeRemove.addItemListener(itemListener);
+    }
+
+    public String getTfNewName(){
         return tfNewName.getText();
     }
+    public String getTfNewPrice(){
+        return tfNewPrice.getText();
+    }
+    public String getTfNewPriceMod(){
+        return tfNewPriceMod.getText();
+    }
+
 
 
     public JPanel getManagePanel() {
@@ -343,14 +382,28 @@ public class ManageHotelPanel extends JPanel {
         return updatePricePanel;
     }
 
-    public JComboBox<String> getCbRoomType() {
-        return cbRoomType;
+    public JComboBox<String> getCbRoomTypeAdd() {
+        return cbRoomTypeAdd;
     }
     public JComboBox<Integer> getCbRmToAdd(){
         return cbRmToAdd;
     }
-
+    public JComboBox<String> getCbRoomTypeRemove() {
+        return cbRoomTypeRemove;
+    }
     public JComboBox<Integer> getCbRmToRemove() {
         return cbRmToRemove;
+    }
+    public JComboBox<Integer> getCbStartDateMod(){
+        return cbStartDateMod;
+    }
+    public JComboBox<Integer> getCbEndDateMod(){
+        return cbEndDateMod;
+    }
+
+
+
+    public JButton getSelectRoomRemoveBtn() {
+        return selectRoomRemoveBtn;
     }
 }

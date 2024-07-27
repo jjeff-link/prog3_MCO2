@@ -2,6 +2,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class BookReservationPanel extends JPanel {
 
@@ -16,6 +17,8 @@ public class BookReservationPanel extends JPanel {
     JComboBox<Integer> cbCheckOut;
     JButton searchRoomsBtn;
     JButton nextBtn;
+
+    ArrayList<JLabel> roomPriceBreak;
 
     public BookReservationPanel() {
         setLayout(new BorderLayout());
@@ -49,8 +52,10 @@ public class BookReservationPanel extends JPanel {
         bookReservationCard = new JPanel(bookReservationCardLayout);
 
         JPanel promptPanel = promptPanel();
+        JPanel confirmPanel = confirmPanel();
 
         bookReservationCard.add(promptPanel, "promptPanel");
+        bookReservationCard.add(confirmPanel, "confirmPanel");
 
 
        bookReservationCardLayout.show(bookReservationCard, "promptPanel");
@@ -108,8 +113,22 @@ public class BookReservationPanel extends JPanel {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
+        //info panel
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        JLabel lblGuestName  = new JLabel("Guest Name" + tfGuestNameField.getText());
+        JLabel lblBreakdownHeader = new JLabel("Price Breakdown: ");
+        infoPanel.add(lblGuestName);
+        infoPanel.add(lblBreakdownHeader);
+        panel.add(infoPanel);
+
+
+        //discount prompt
+
         return panel;
     }
+
+
 
     public void setActionListener(ActionListener actionListener) {
         cbHotels.addActionListener(actionListener);
@@ -129,6 +148,10 @@ public class BookReservationPanel extends JPanel {
     public JPanel getBookReservationCard() {
         return bookReservationCard;
     }
+    public JComboBox<String> getCbHotels(){
+        return cbHotels;
+    }
+
 
 
 }

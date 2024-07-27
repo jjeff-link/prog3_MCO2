@@ -27,7 +27,7 @@ public class Hotel {
      */
     public Hotel(String hotelName) {
         this.hotelName = hotelName;
-        this.rooms.add(new Standard("S1")); //initializes the first room to a hotel
+        this.rooms.add(new Standard("S01")); //initializes the first room to a hotel
         for(int i = 0; i < 31; i++) {
             dateMultiplier[i] = 1;
         }

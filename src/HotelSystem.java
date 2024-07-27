@@ -1,5 +1,9 @@
 import java.lang.reflect.Executable;
+import java.text.Collator;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Locale;
 
 /** Represents a Hotel System
  * @author Cumti
@@ -75,10 +79,18 @@ public class HotelSystem {
                 currExecutive++;
         }
 
-        if (roomType == 1)
+        if (roomType == 1) {
+            if (currStandard < 9)
+                return "S0" + (currStandard + 1);
             return "S" + (currStandard + 1);
-        if (roomType == 2)
+        }
+        if (roomType == 2){
+            if (currDeluxe < 9)
+                return "D0" + (currDeluxe + 1);
             return "D" + (currDeluxe + 1);
+        }
+        if(currExecutive < 9)
+            return "E0" + (currExecutive + 1);
         return "E" + (currExecutive + 1);
 
     }
@@ -182,6 +194,7 @@ public class HotelSystem {
             System.out.println("Hotel already exists\n"); //returns error message if hotelName is taken
     }
 
+
     /**
      * Adds a new room to a hotel. nRooms is checked before calling, thus is assumed valid upon calling the method.
      * @param hotel hotel which a new room will be added
@@ -218,29 +231,69 @@ public class HotelSystem {
      * @param hotel hotel which a room will be removed
      * @param nRooms number of rooms to be removed
      */
-    public void removeRoom(Hotel hotel, int nRooms) {
+    public void removeRoom(Hotel hotel, int nRooms, int roomType) {
         int i;
         boolean isEmpty = true; //boolean to check if room has no active reservation
 
-        if (hotel.getRooms().size() == 1 && nRooms > 0)
-            System.out.println("Cannot remove more rooms.\n"); //if no more rooms can be removed
-
         for (i = hotel.getRooms().size() - 1; i > 0 && nRooms > 0; i--) {
-            for (Reservation reservation : hotel.getReservations()) {
-                if (reservation.getRoom().getRoomName().equals(hotel.getRooms().get(i).getRoomName())) {
-                    isEmpty = false;    //checks if room has no reservation
+            if(roomType == 1 && hotel.getRooms().get(i) instanceof Standard) {
+                for (Reservation reservation : hotel.getReservations()) {
+                    if (reservation.getRoom().getRoomName().equals(hotel.getRooms().get(i).getRoomName())) {
+                        isEmpty = false;    //checks if room has no reservation
+                    }
+                }
+                if (isEmpty) {
+                    System.out.println(hotel.getRooms().get(i).getRoomName() + " removed\n"); //confirmation message
+                    hotel.getRooms().remove(i);     //room is removed if empty
+                    nRooms--;
                 }
             }
-            if (isEmpty) {
-                System.out.println(hotel.getRooms().get(i).getRoomName() + " removed\n"); //confirmation message
-                hotel.getRooms().remove(i);     //room is removed if empty
-                nRooms--;
+            if(roomType == 2 && hotel.getRooms().get(i) instanceof Deluxe) {
+                for (Reservation reservation : hotel.getReservations()) {
+                    if (reservation.getRoom().getRoomName().equals(hotel.getRooms().get(i).getRoomName())) {
+                        isEmpty = false;    //checks if room has no reservation
+                    }
+                }
+                if (isEmpty) {
+                    System.out.println(hotel.getRooms().get(i).getRoomName() + " removed\n"); //confirmation message
+                    hotel.getRooms().remove(i);     //room is removed if empty
+                    nRooms--;
+                }
             }
-
-            if (i == 1 && nRooms > 0)
-                System.out.println("Cannot remove more rooms.\n"); //if no more rooms can be removed
-
+            if(roomType == 3 && hotel.getRooms().get(i) instanceof Executive) {
+                for (Reservation reservation : hotel.getReservations()) {
+                    if (reservation.getRoom().getRoomName().equals(hotel.getRooms().get(i).getRoomName())) {
+                        isEmpty = false;    //checks if room has no reservation
+                    }
+                }
+                if (isEmpty) {
+                    System.out.println(hotel.getRooms().get(i).getRoomName() + " removed\n"); //confirmation message
+                    hotel.getRooms().remove(i);     //room is removed if empty
+                    nRooms--;
+                }
+            }
         }
+
+
+//        if (hotel.getRooms().size() == 1 && nRooms > 0)
+//            System.out.println("Cannot remove more rooms.\n"); //if no more rooms can be removed
+//
+//        for (i = hotel.getRooms().size() - 1; i > 0 && nRooms > 0; i--) {
+//            for (Reservation reservation : hotel.getReservations()) {
+//                if (reservation.getRoom().getRoomName().equals(hotel.getRooms().get(i).getRoomName())) {
+//                    isEmpty = false;    //checks if room has no reservation
+//                }
+//            }
+//            if (isEmpty) {
+//                System.out.println(hotel.getRooms().get(i).getRoomName() + " removed\n"); //confirmation message
+//                hotel.getRooms().remove(i);     //room is removed if empty
+//                nRooms--;
+//            }
+//
+//            if (i == 1 && nRooms > 0)
+//                System.out.println("Cannot remove more rooms.\n"); //if no more rooms can be removed
+//
+//        }
     }
 
     /**
@@ -266,7 +319,9 @@ public class HotelSystem {
     }
 
     public void changeDateModifier(Hotel hotel, int startDate, int endDate, double modifier){
-        if(modifier >= 0.5 && modifier <= 1.50) {
+        boolean valid = endDate > startDate;
+
+        if(modifier >= 0.5 && modifier <= 1.50 && valid) {
             for (int i = startDate - 1; i < endDate - 1; i++) {
                 hotel.setDateMultiplier(i, modifier);
             }

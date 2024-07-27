@@ -4,6 +4,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Locale;
 
 public class tempCtr implements ActionListener, DocumentListener, ItemListener {
     private HotelSystem hotelSystem;
@@ -85,8 +89,17 @@ public class tempCtr implements ActionListener, DocumentListener, ItemListener {
         if(e.getActionCommand().equals("Remove Room")){
             view.getManageHotelPanel().getManageCardLayout().show(view.getManageHotelPanel().getManagePanel(), "removeRoomsPanel");
         }
+        if(e.getActionCommand().equals("Select Room Type")){
+            updateCbRmToRemove();
+        }
+        if(e.getActionCommand().equals("Confirm Remove Room")){
+            removeRoom();
+        }
         if(e.getActionCommand().equals("Update Base Price")){
             view.getManageHotelPanel().getManageCardLayout().show(view.getManageHotelPanel().getManagePanel(), "updatePricePanel");
+        }
+        if(e.getActionCommand().equals("Confirm Base Price")){
+            updateBasePrice();
         }
         if(e.getActionCommand().equals("Update Price Modifier")){
             view.getManageHotelPanel().getManageCardLayout().show(view.getManageHotelPanel().getManagePanel(), "updatePriceModPanel");
@@ -99,6 +112,12 @@ public class tempCtr implements ActionListener, DocumentListener, ItemListener {
         }
         if(e.getActionCommand().equals("Book Reservation")){
             view.getMainCardLayout().show(view.getMainCardPanel(), "bookReservation");
+        }
+        if(e.getActionCommand().equals("Confirm Price Modifier")){
+            updatePriceMod();
+        }
+        if(e.getActionCommand().equals("Next")){
+            view.getBookReservationPanel().getBookReservationCardLayout().show(view.getBookReservationPanel().getBookReservationCard(), "confirmPanel");
         }
 
     }
@@ -140,7 +159,7 @@ public class tempCtr implements ActionListener, DocumentListener, ItemListener {
 
     public void changeName(){
         Hotel hotel = hotelSystem.getHotels().get(index);
-        String newName = view.getManageHotelPanel().getNewName();
+        String newName = view.getManageHotelPanel().getTfNewName();
 
         hotelSystem.changeHotelName(hotel, newName);
         updateCbHotels();
@@ -148,7 +167,7 @@ public class tempCtr implements ActionListener, DocumentListener, ItemListener {
 
     public void addRoom(){
         Hotel hotel = hotelSystem.getHotels().get(index);
-        String roomType = view.getManageHotelPanel().getCbRoomType().getSelectedItem().toString();
+        String roomType = view.getManageHotelPanel().getCbRoomTypeAdd().getSelectedItem().toString();
         int roomTypeChoice;
         int roomCount = (int) view.getManageHotelPanel().getCbRmToAdd().getSelectedItem();
         System.out.println(roomCount);
@@ -168,28 +187,60 @@ public class tempCtr implements ActionListener, DocumentListener, ItemListener {
     public void removeRoom(){
         Hotel hotel = hotelSystem.getHotels().get(index);
         int roomCount = (int) view.getManageHotelPanel().getCbRmToRemove().getSelectedItem();
-        System.out.println(roomCount);
+        String roomType = view.getManageHotelPanel().getCbRoomTypeRemove().getSelectedItem().toString();
 
-        hotelSystem.removeRoom(hotel, roomCount);
-        //updateCbRmToRemove();
+        if(roomType.equals("Standard"))
+            hotelSystem.removeRoom(hotel, roomCount, 1);
+        else if(roomType.equals("Deluxe"))
+            hotelSystem.removeRoom(hotel, roomCount, 2);
+        else
+            hotelSystem.removeRoom(hotel, roomCount, 3);
+        updateCbRmToRemove();
+    }
+
+    public void updateBasePrice(){
+        Hotel hotel = hotelSystem.getHotels().get(index);
+        double newPrice = Double.parseDouble(view.getManageHotelPanel().getTfNewPrice());
+        hotelSystem.updatePrice(hotel, newPrice);
+    }
+
+    public void updatePriceMod(){
+        Hotel hotel = hotelSystem.getHotels().get(index);
+        int startDate = (int) view.getManageHotelPanel().getCbStartDateMod().getSelectedItem();
+        int endDate = (int) view.getManageHotelPanel().getCbEndDateMod().getSelectedItem();
+        double modifier = Double.parseDouble(view.getManageHotelPanel().getTfNewPriceMod());
+
+        hotelSystem.changeDateModifier(hotel, startDate, endDate, modifier);
+
     }
 
 
 
     public void updateCbHotels(){
         view.cbHotelNames.removeAllItems();
+        view.getBookReservationPanel().getCbHotels().removeAllItems();
         for(Hotel hotel : hotelSystem.getHotels()){
             view.cbHotelNames.addItem(hotel.getHotelName());
+            view.getBookReservationPanel().getCbHotels().addItem(hotel.getHotelName());
         }
     }
 
     public void updateCbRooms(){
-        view.getViewHotelPanel().getCbRoomNames().removeAllItems();
+        ArrayList<String> roomList = new ArrayList<>();
         Hotel hotel = hotelSystem.getHotels().get(index);
-        for(Room room : hotel.getRooms()){
-            view.getViewHotelPanel().getCbRoomNames().addItem(room.getRoomName());
+        for(Room room: hotel.getRooms()){
+            roomList.add(room.getRoomName());
+        }
+        Collator collator = Collator.getInstance(Locale.US);
+        collator.setStrength(Collator.PRIMARY);
+        Collections.sort(roomList, collator::compare);
+
+        view.getViewHotelPanel().getCbRoomNames().removeAllItems();
+        for(String roomName : roomList){
+            view.getViewHotelPanel().getCbRoomNames().addItem(roomName);
         }
     }
+
 
     public void updateCbRmToAdd(){
         view.getManageHotelPanel().getCbRmToAdd().removeAllItems();
@@ -199,14 +250,38 @@ public class tempCtr implements ActionListener, DocumentListener, ItemListener {
         }
     }
 
-//    public void updateCbRmToRemove(){
-//        view.getManageHotelPanel().getCbRmToRemove().removeAllItems();
-//        Hotel hotel = hotelSystem.getHotels().get(index);
-//        for(int i = 1; i <= hotel.getRooms().size(); i++){
-//            if(hotel.getRooms().get(i).)
-//            view.getManageHotelPanel().getCbRmToRemove().addItem(i);
-//        }
-//    }
+    public void updateCbRmToRemove(){
+        Hotel hotel = hotelSystem.getHotels().get(index);
+        String roomType = view.getManageHotelPanel().getCbRoomTypeRemove().getSelectedItem().toString();
+        int roomCount = 0;
+        boolean removable = hotel.getRooms().size() > 1;
+        view.getManageHotelPanel().getCbRmToRemove().removeAllItems();
+
+
+        for(int i = 0; i < hotel.getRooms().size() && removable; i++){
+            if(roomType.equals("Standard")){
+                if(hotel.getRooms().get(i) instanceof Standard) {
+                    roomCount++;
+                    view.getManageHotelPanel().getCbRmToRemove().addItem(roomCount);
+                }
+            }
+            if(roomType.equals("Deluxe")){
+                if(hotel.getRooms().get(i) instanceof Deluxe) {
+                    roomCount++;
+                    view.getManageHotelPanel().getCbRmToRemove().addItem(roomCount);
+                }
+            }
+            if(roomType.equals("Executive")){
+                if(hotel.getRooms().get(i) instanceof Executive){
+                    roomCount++;
+                    view.getManageHotelPanel().getCbRmToRemove().addItem(roomCount);
+                }
+            }
+        }
+        if(roomCount == hotel.getRooms().size())
+            view.getManageHotelPanel().getCbRmToRemove().removeItemAt(roomCount - 1);
+        view.getManageHotelPanel().getManageCardLayout().show(view.getManageHotelPanel().getManagePanel(), "removeRoom");
+    }
 
 
     @Override

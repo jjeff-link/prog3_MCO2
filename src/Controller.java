@@ -193,8 +193,8 @@ public class Controller {
 
         if(rooms <= 0)
             System.out.println("Invalid input\n"); //error message for invalid input
-        else
-            hotelSystem.removeRoom(hotel, rooms); //inputs info entered by user to method
+        //else
+            //hotelSystem.removeRoom(hotel, rooms); //inputs info entered by user to method
     }
 
     /**
