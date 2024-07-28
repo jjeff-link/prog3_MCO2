@@ -7,18 +7,32 @@ import java.util.ArrayList;
 public class BookReservationPanel extends JPanel {
 
 
-    CardLayout bookReservationCardLayout = new CardLayout();
-    JPanel bookReservationCard = new JPanel();
+    private CardLayout bookReservationCardLayout = new CardLayout();
+    private JPanel bookReservationCard = new JPanel();
 
-    JTextField tfGuestNameField;
-    JComboBox<String> cbHotels;
-    JComboBox<String> cbRoomTypes;
-    JComboBox<Integer> cbCheckIn;
-    JComboBox<Integer> cbCheckOut;
-    JButton searchRoomsBtn;
-    JButton nextBtn;
+    private JPanel promptPanel;
+    private JPanel confirmPanel;
+    private JPanel bookedDetailsPanel;
+    JPanel breakdownPanel;
+    private JPanel infoPanel;
 
-    ArrayList<JLabel> roomPriceBreak;
+    private JTextField tfGuestNameField;
+    private JComboBox<String> cbHotels;
+    private JComboBox<String> cbRoomTypes;
+    private JComboBox<Integer> cbCheckIn;
+    private JComboBox<Integer> cbCheckOut;
+    private JButton searchRoomsBtn;
+    private JButton nextBtn;
+
+    private int roomIndex;
+    private ArrayList<JLabel> priceBreakdown;
+    private JTextField tfDiscountCode;
+    private JButton confirmBookBtn;
+    private JButton cancelBookBtn;
+
+    private JLabel roomName;
+    private JButton returnBtn;
+
 
     public BookReservationPanel() {
         setLayout(new BorderLayout());
@@ -43,6 +57,8 @@ public class BookReservationPanel extends JPanel {
         cbRoomTypes = new JComboBox<String>(roomTypes);
         cbCheckIn = new JComboBox<Integer>(checkInDates);
         cbCheckOut = new JComboBox<Integer>(checkOutDates);
+        priceBreakdown = new ArrayList<JLabel>();
+        roomName = new JLabel();
 
 
         JLabel lblBookReservation = new JLabel("Book Reservation");
@@ -51,11 +67,15 @@ public class BookReservationPanel extends JPanel {
         bookReservationCardLayout = new CardLayout();
         bookReservationCard = new JPanel(bookReservationCardLayout);
 
-        JPanel promptPanel = promptPanel();
-        JPanel confirmPanel = confirmPanel();
+        promptPanel = promptPanel();
+        confirmPanel = confirmPanel();
+        bookedDetailsPanel = bookedDetailsPanel();
+        infoPanel = infoPanel();
+        breakdownPanel = breakDownPanel();
 
         bookReservationCard.add(promptPanel, "promptPanel");
         bookReservationCard.add(confirmPanel, "confirmPanel");
+        bookReservationCard.add(bookedDetailsPanel, "bookedDetailsPanel");
 
 
        bookReservationCardLayout.show(bookReservationCard, "promptPanel");
@@ -103,6 +123,15 @@ public class BookReservationPanel extends JPanel {
         datePanel.add(cbCheckOut);
         panel.add(datePanel);
 
+        //discount prompt
+        JPanel discountPanel = new JPanel();
+        discountPanel.setLayout(new FlowLayout());
+        JLabel lblDiscountPrompt = new JLabel("Discount Code (Optional): ");
+        discountPanel.add(lblDiscountPrompt);
+        tfDiscountCode = new JTextField(10);
+        discountPanel.add(tfDiscountCode);
+        panel.add(discountPanel);
+
         nextBtn = new JButton("Next");
         panel.add(nextBtn);
 
@@ -114,18 +143,88 @@ public class BookReservationPanel extends JPanel {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         //info panel
-        JPanel infoPanel = new JPanel();
-        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-        JLabel lblGuestName  = new JLabel("Guest Name" + tfGuestNameField.getText());
-        JLabel lblBreakdownHeader = new JLabel("Price Breakdown: ");
-        infoPanel.add(lblGuestName);
-        infoPanel.add(lblBreakdownHeader);
+        JPanel infoPanel = infoPanel();
         panel.add(infoPanel);
 
+        //confirmPrompt
+        JPanel confirmBookPanel = new JPanel();
+        confirmBookPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        JLabel lblConfirmBooking = new JLabel("Confirm?");
+        confirmBookPanel.add(lblConfirmBooking);
+        confirmBookBtn = new JButton("Confirm Booking");
+        confirmBookPanel.add(confirmBookBtn);
+        cancelBookBtn = new JButton("Cancel Booking");
+        confirmBookPanel.add(cancelBookBtn);
+        panel.add(confirmBookPanel);
 
-        //discount prompt
 
         return panel;
+    }
+
+    public JPanel bookedDetailsPanel(){
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        JLabel lblSuccess = new JLabel("Booking Successful!");
+        panel.add(lblSuccess);
+
+        //details
+        JPanel infoPanel = infoPanel();
+        panel.add(infoPanel);
+        panel.add(roomName);
+
+        returnBtn = new JButton("Return to Main");
+        panel.add(returnBtn);
+
+
+        return panel;
+    }
+
+    public JPanel infoPanel(){
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        JLabel lblGuestName  = new JLabel("Guest Name: " + tfGuestNameField.getText());
+        infoPanel.add(lblGuestName);
+        JLabel hotelName = new JLabel("Hotel Name: " + cbHotels.getSelectedItem());
+        infoPanel.add(hotelName);
+        JLabel roomType = new JLabel("Room Type: " + cbRoomTypes.getSelectedItem());
+        infoPanel.add(roomType);
+        JLabel lblBreakdownHeader = new JLabel("Price Breakdown: ");
+        infoPanel.add(lblBreakdownHeader);
+        breakdownPanel = breakDownPanel();
+        infoPanel.add(breakdownPanel);
+
+        return infoPanel;
+    }
+
+
+
+
+    public void updateRoomBreakList(ArrayList<String> breakList){
+        priceBreakdown.clear();
+        for(String line : breakList){
+            System.out.println(line);
+            this.priceBreakdown.add(new JLabel(line));
+        }
+
+        refreshConfirmPanel();
+    }
+
+
+    public JPanel breakDownPanel(){
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        for(JLabel label : priceBreakdown){
+            panel.add(label);
+        }
+        return panel;
+    }
+
+    private void refreshConfirmPanel() {
+        confirmPanel.remove(infoPanel);
+        confirmPanel.add(infoPanel());
+        confirmPanel.revalidate();
+        confirmPanel.repaint();
     }
 
 
@@ -137,9 +236,13 @@ public class BookReservationPanel extends JPanel {
         cbCheckOut.addActionListener(actionListener);
         searchRoomsBtn.addActionListener(actionListener);
         nextBtn.addActionListener(actionListener);
+        cancelBookBtn.addActionListener(actionListener);
+        returnBtn.addActionListener(actionListener);
+        confirmBookBtn.addActionListener(actionListener);
     }
     public void setDocumentListener(DocumentListener documentListener) {
         tfGuestNameField.getDocument().addDocumentListener(documentListener);
+        tfDiscountCode.getDocument().addDocumentListener(documentListener);
     }
 
     public CardLayout getBookReservationCardLayout() {
@@ -151,7 +254,29 @@ public class BookReservationPanel extends JPanel {
     public JComboBox<String> getCbHotels(){
         return cbHotels;
     }
+    public JComboBox<String> getCbRoomTypes(){
+        return cbRoomTypes;
+    }
+    public JComboBox<Integer> getCbCheckIn(){
+        return cbCheckIn;
+    }
+    public JComboBox<Integer> getCbCheckOut(){
+        return cbCheckOut;
+    }
+    public int getRoomIndex() {
+        return roomIndex;
+    }
+    public void setRoomIndex(int roomIndex) {
+        this.roomIndex = roomIndex;
+    }
+    public String getTfGuestName() {
+        return tfGuestNameField.getText();
+    }
+    public String getTfDiscountCode() {
+        return tfDiscountCode.getText();
+    }
 
-
-
+    public void setRoomName(String roomName) {
+        this.roomName.setText("Your room is: " + roomName);
+    }
 }

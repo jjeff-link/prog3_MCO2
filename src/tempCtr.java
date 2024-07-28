@@ -12,7 +12,10 @@ import java.util.Locale;
 public class tempCtr implements ActionListener, DocumentListener, ItemListener {
     private HotelSystem hotelSystem;
     private View view;
-    int index;
+    private int index;
+    private int bookedRoomIndex;
+    private int bookedCheckInDate;
+    private int bookedCheckOutDate;
 
     public tempCtr(View view, HotelSystem hotelSystem) {
         this.view = view;
@@ -117,8 +120,14 @@ public class tempCtr implements ActionListener, DocumentListener, ItemListener {
             updatePriceMod();
         }
         if(e.getActionCommand().equals("Next")){
-            view.getBookReservationPanel().getBookReservationCardLayout().show(view.getBookReservationPanel().getBookReservationCard(), "confirmPanel");
+            validateBook();
+            updateConfirmInfo(bookedRoomIndex);
         }
+
+        if(e.getActionCommand().equals("Confirm Booking")){
+            confirmBook();
+        }
+        System.out.println(e.getActionCommand());
 
     }
 
@@ -282,6 +291,61 @@ public class tempCtr implements ActionListener, DocumentListener, ItemListener {
             view.getManageHotelPanel().getCbRmToRemove().removeItemAt(roomCount - 1);
         view.getManageHotelPanel().getManageCardLayout().show(view.getManageHotelPanel().getManagePanel(), "removeRoom");
     }
+
+    public void validateBook(){
+        Hotel hotel = hotelSystem.getHotels().get(index);
+        int checkInDate = (int) view.getBookReservationPanel().getCbCheckIn().getSelectedItem();
+        int checkOutDate = (int) view.getBookReservationPanel().getCbCheckOut().getSelectedItem();
+        String roomType = view.getBookReservationPanel().getCbRoomTypes().getSelectedItem().toString();
+        int roomTypePar = 0;
+        boolean valid = checkInDate < checkOutDate;
+
+        if(roomType.equals("Standard"))
+            roomTypePar = 1;
+        if(roomType.equals("Deluxe"))
+            roomTypePar = 2;
+        if(roomType.equals("Executive"))
+            roomTypePar = 3;
+
+        if(valid) {
+            bookedRoomIndex = hotelSystem.findVacantRoom(hotel, checkInDate, checkOutDate, roomTypePar);
+        }
+    }
+
+    public void updateConfirmInfo(int bookedIndex){
+        ArrayList<String> roomBreakList;
+        Hotel hotel = hotelSystem.getHotels().get(index);
+        bookedCheckInDate = (int) view.getBookReservationPanel().getCbCheckIn().getSelectedItem();
+        bookedCheckOutDate = (int) view.getBookReservationPanel().getCbCheckOut().getSelectedItem();
+        String discCode = view.getBookReservationPanel().getTfDiscountCode();
+
+
+        if(discCode.isEmpty()) {
+            roomBreakList = hotelSystem.breakdownList(hotel, bookedIndex, bookedCheckInDate, bookedCheckOutDate);
+            view.getBookReservationPanel().updateRoomBreakList(roomBreakList);
+        }
+        else{
+            roomBreakList = hotelSystem.breakdownList(hotel, bookedIndex, bookedCheckInDate, bookedCheckOutDate, discCode);
+            view.getBookReservationPanel().updateRoomBreakList(roomBreakList);
+        }
+
+        view.getBookReservationPanel().getBookReservationCardLayout().show(view.getBookReservationPanel().getBookReservationCard(), "confirmPanel");
+    }
+
+    public void confirmBook(){
+        Hotel hotel = hotelSystem.getHotels().get(index);
+        bookedCheckInDate = (int) view.getBookReservationPanel().getCbCheckIn().getSelectedItem();
+        bookedCheckOutDate = (int) view.getBookReservationPanel().getCbCheckOut().getSelectedItem();
+        String guestName = view.getBookReservationPanel().getTfGuestName();
+        String discCode = view.getBookReservationPanel().getTfDiscountCode();
+
+        hotelSystem.book(hotel, guestName, bookedRoomIndex, bookedCheckInDate, bookedCheckOutDate, discCode);
+        System.out.println("Booking Added!");
+        view.getBookReservationPanel().setRoomName(hotel.getRooms().get(bookedRoomIndex).getRoomName());
+        view.getBookReservationPanel().getBookReservationCardLayout().show(view.getBookReservationPanel().getBookReservationCard(), "bookedDetailsPanel");
+    }
+
+
 
 
     @Override

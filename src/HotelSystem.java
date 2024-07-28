@@ -1,15 +1,10 @@
-import java.lang.reflect.Executable;
-import java.text.Collator;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Locale;
 
 /** Represents a Hotel System
  * @author Cumti
  * @author Escano
  */
-public class HotelSystem {
+public class HotelSystem implements Discounts{
     /**
      * Represents the list of hotels in a system
      */
@@ -402,6 +397,111 @@ public class HotelSystem {
         }
     }
 
+    public ArrayList<String> breakdownList(Hotel hotel, int roomIndex, int checkInDate, int checkOutDate){
+        String roomItem;
+        ArrayList<String> roomBreakList = new ArrayList<>();
+        int percentage;
+        double roomPrice = hotel.getRooms().get(roomIndex).getPrice();
+        double totalPrice;
+
+
+        for(int i = checkInDate; i < checkOutDate; i++){
+            percentage = (int) (hotel.getDateMultiplier()[i - 1] * 100);
+            totalPrice = roomPrice * hotel.getDateMultiplier()[i - 1];
+            roomItem = String.format("June %d - June %d: P%.2f * %d%% --> P%.2f", i, (i + 1), roomPrice, percentage, totalPrice);
+            roomBreakList.add(roomItem);
+        }
+        totalPrice = getSubtotal(hotel, checkInDate, checkOutDate, roomIndex);
+        roomBreakList.add("Subtotal: " + totalPrice);
+        roomBreakList.add("Total: " + totalPrice);
+
+        return roomBreakList;
+    }
+
+    public ArrayList<String> breakdownList(Hotel hotel, int roomIndex, int checkInDate, int checkOutDate, String discCode){
+        String roomItem;
+        String discountMessage;
+        ArrayList<String> roomBreakList = new ArrayList<>();
+        int percentage;
+        double roomPrice = hotel.getRooms().get(roomIndex).getPrice();
+        double itemPrice, subTotal, totalPrice;
+        double lessDiscount = 0;
+
+        subTotal = getSubtotal(hotel, checkInDate, checkOutDate, roomIndex);
+
+        if(discCode.equals("I_WORK_HERE")){
+            lessDiscount = iWorkHere(subTotal);
+            discountMessage = String.format("Discount: I_WORK_HERE (less 10%%)  - P%.2f", lessDiscount);
+        }
+        else if(discCode.equals("STAY4_GET1")){
+            lessDiscount = stay4Get1(roomPrice * hotel.getDateMultiplier()[checkInDate- 1], checkInDate, checkOutDate);
+            if(lessDiscount == 0)
+                discountMessage = "Cannot Apply Discount Code";
+            else
+                discountMessage = String.format("Discount: STAY4_GET1 (first night free)  - P%.2f", lessDiscount);
+        }
+        else if(discCode.equals("PAYDAY")){
+            lessDiscount = payday(subTotal, checkInDate, checkOutDate);
+            if(lessDiscount == 0)
+                discountMessage = "Cannot Apply Discount Code";
+            else
+                discountMessage = String.format("Discount: PAYDAY (less 7%% on 15/30)  - P%.2f", lessDiscount);
+        }
+        else
+            discountMessage = "Discount code not found";
+
+        totalPrice = subTotal - lessDiscount;
+
+
+        for(int i = checkInDate; i < checkOutDate; i++){
+            percentage = (int) (hotel.getDateMultiplier()[i - 1] * 100);
+            itemPrice = roomPrice * hotel.getDateMultiplier()[i - 1];
+            roomItem = String.format("June %d - June %d: P%.2f * %d%% --> P%.2f", i, (i + 1), roomPrice, percentage, itemPrice);
+            roomBreakList.add(roomItem);
+        }
+        roomBreakList.add("Subtotal:                                P" + subTotal);
+        roomBreakList.add(discountMessage);
+        roomBreakList.add("Total:                                   P" + totalPrice);
+
+        return roomBreakList;
+    }
+
+
+    public double getSubtotal(Hotel hotel, int checkInDate, int checkOutDate, int roomIndex){
+        double subtotal = 0;
+
+        for(int i = checkInDate; i < checkOutDate; i++) {
+            subtotal += hotel.getDateMultiplier()[i - 1] * hotel.getRooms().get(roomIndex).getPrice();
+        }
+        return subtotal;
+    }
+
+    public double getTotalPrice(Hotel hotel, int roomIndex, int checkInDate, int checkOutDate, String discCode){
+        double subtotal, total;
+        double lessDisc = 0;
+        double roomPrice = hotel.getRooms().get(roomIndex).getPrice();
+
+        subtotal = getSubtotal(hotel, checkInDate, checkOutDate, roomIndex);
+        if(discCode.equals("I_WORK_HERE"))
+            lessDisc = iWorkHere(subtotal);
+        if(discCode.equals("STAY4_GET1"))
+            lessDisc = stay4Get1(roomPrice * hotel.getDateMultiplier()[checkInDate- 1], checkInDate, checkOutDate);
+        if(discCode.equals("PAYDAY"))
+            lessDisc = payday(subtotal, checkInDate, checkOutDate);
+
+        total = subtotal - lessDisc;
+
+        return total;
+    }
+
+    public void book(Hotel hotel, String guestName, int roomIndex, int checkInDate, int checkOutDate, String discCode){
+        double totalPrice = getTotalPrice(hotel, roomIndex, checkInDate, checkOutDate, discCode);
+        Reservation newBooking = new Reservation(guestName, checkInDate, checkOutDate, hotel.getRooms().get(roomIndex), totalPrice);
+        hotel.addReservation(newBooking);
+    }
+
+
+
     /**
      * Getter method for hotels ArrayList
      * @return hotels
@@ -410,4 +510,21 @@ public class HotelSystem {
         return hotels;
     }
 
+    public double iWorkHere(double price) {
+        return price * 0.10;
+    }
+
+    public double stay4Get1(double price, int checkInDate, int checkOutDate) {
+        if(checkOutDate - checkInDate >= 5)
+            return price;
+        return 0;
+    }
+
+    public double payday(double price, int checkInDate, int checkOutDate) {
+        if(inRange(15, checkInDate, checkOutDate - 1))
+            return price * 0.07;
+        if(inRange(30, checkInDate, checkOutDate - 1))
+            return price * 0.07;
+        return 0;
+    }
 }

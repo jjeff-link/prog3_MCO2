@@ -186,6 +186,15 @@ public class View extends JFrame {
         return panel;
     }
 
+    public JOptionPane confirmedDetails(){
+        JOptionPane pane = new JOptionPane();
+        pane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
+
+
+
+        return pane;
+    }
+
 
 
 
