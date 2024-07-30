@@ -356,6 +356,9 @@ public class ManageHotelPanel extends JPanel {
     public String getTfNewPriceMod(){
         return tfNewPriceMod.getText();
     }
+    public String getTfGuestName(){
+        return tfGuestName.getText();
+    }
 
 
 

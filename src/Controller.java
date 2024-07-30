@@ -304,58 +304,58 @@ public class Controller {
     /**
      * Method to simulate booking. Interacts with user to book a reservation
      */
-    public void booking(){
-        Scanner scanner = new Scanner(System.in);
-        String hotelName, guestName;
-        int index;
-        int roomType;
-        int checkinDate;
-        int checkoutDate = 0;
-        boolean valid = true;
-        Hotel hotel;
-
-        viewer.displayHotels(hotelSystem.getHotels()); //displays list of current hotels
-        System.out.println("Enter hotel name: ");
-        hotelName = scanner.nextLine(); //asks for hotel name based on list
-        index = hotelSystem.searchHotel(hotelName); //finds the index of hotel
-        if(index == -1)
-            System.out.println("Hotel not found\n");
-        else {
-            hotel = hotelSystem.getHotels().get(index); //assigns index to a hotel attribute
-
-            //asks user for booking information
-            System.out.println("Enter Guest Name: ");
-            guestName = scanner.nextLine(); //asks for the guestName
-            System.out.println("Enter Room Type");
-            System.out.println("[1] - Standard");
-            System.out.println("[2] - Deluxe");
-            System.out.println("[3] - Executive");
-            roomType = scanner.nextInt();
-            System.out.println("Available Dates");
-
-            System.out.println("Enter Check-in date: ");
-            checkinDate = scanner.nextInt(); //asks for date of checkIn
-            if(checkinDate < 0 || checkinDate > 30)
-                valid = false;
-
-            if (valid) { //if checkinDate is valid
-                System.out.println("Enter Check-out date: ");
-                checkoutDate = scanner.nextInt(); //asks user for checkOut date
-                if (checkoutDate <= 1 || checkoutDate > 31 || checkinDate >= checkoutDate) { //validates input
-                    valid = false;
-                    System.out.println("Invalid date\n"); //error message if invalid
-                }
-            }
-
-            if (valid) { //if checkoutDate is valid
-                viewer.confirmDetails(hotel, guestName, checkinDate, checkoutDate); //displays booking information
-                if (scanner.next().equalsIgnoreCase("y")) //asks user to confirm if booking will push through
-                    hotelSystem.Book(hotelSystem.getHotels().get(index), guestName, checkinDate, checkoutDate, roomType); //punches reservation to the system
-                else
-                    System.out.println("Booking Cancelled.\n"); //if booking is cancelled
-            }
-        }
-    }
+//    public void booking(){
+//        Scanner scanner = new Scanner(System.in);
+//        String hotelName, guestName;
+//        int index;
+//        int roomType;
+//        int checkinDate;
+//        int checkoutDate = 0;
+//        boolean valid = true;
+//        Hotel hotel;
+//
+//        viewer.displayHotels(hotelSystem.getHotels()); //displays list of current hotels
+//        System.out.println("Enter hotel name: ");
+//        hotelName = scanner.nextLine(); //asks for hotel name based on list
+//        index = hotelSystem.searchHotel(hotelName); //finds the index of hotel
+//        if(index == -1)
+//            System.out.println("Hotel not found\n");
+//        else {
+//            hotel = hotelSystem.getHotels().get(index); //assigns index to a hotel attribute
+//
+//            //asks user for booking information
+//            System.out.println("Enter Guest Name: ");
+//            guestName = scanner.nextLine(); //asks for the guestName
+//            System.out.println("Enter Room Type");
+//            System.out.println("[1] - Standard");
+//            System.out.println("[2] - Deluxe");
+//            System.out.println("[3] - Executive");
+//            roomType = scanner.nextInt();
+//            System.out.println("Available Dates");
+//
+//            System.out.println("Enter Check-in date: ");
+//            checkinDate = scanner.nextInt(); //asks for date of checkIn
+//            if(checkinDate < 0 || checkinDate > 30)
+//                valid = false;
+//
+//            if (valid) { //if checkinDate is valid
+//                System.out.println("Enter Check-out date: ");
+//                checkoutDate = scanner.nextInt(); //asks user for checkOut date
+//                if (checkoutDate <= 1 || checkoutDate > 31 || checkinDate >= checkoutDate) { //validates input
+//                    valid = false;
+//                    System.out.println("Invalid date\n"); //error message if invalid
+//                }
+//            }
+//
+//            if (valid) { //if checkoutDate is valid
+//                viewer.confirmDetails(hotel, guestName, checkinDate, checkoutDate); //displays booking information
+//                if (scanner.next().equalsIgnoreCase("y")) //asks user to confirm if booking will push through
+//                    //hotelSystem.Book(hotelSystem.getHotels().get(index), guestName, checkinDate, checkoutDate, roomType); //punches reservation to the system
+//                else
+//                    System.out.println("Booking Cancelled.\n"); //if booking is cancelled
+//            }
+//        }
+//    }
 
     /**
      * Main menu. Displays and ask user for options in the system
@@ -379,7 +379,7 @@ public class Controller {
                     manageHotel();
                     break;
                 case 4:
-                    booking();
+                    //booking();
                     break;
                 case 5:
                     System.out.println("Shutting Down.......\n\n"); //will exit the loop and program

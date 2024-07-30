@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class ViewHotelPanel extends Panel {
     private JLabel lblHotelName;
@@ -25,10 +26,20 @@ public class ViewHotelPanel extends Panel {
     private int chosenDate;
     private int bookedRooms;
 
+    private JPanel roomInfo;
     private JComboBox<String> cbRoomNames;
     private JButton selectRoom;
     private JLabel lblRoomName;
     private JLabel lblRoomType;
+    private JLabel lblBasePrice;
+
+
+
+    private JTextField tfGuestName;
+    private JButton searchReservation;;
+    private JPanel reservationInfoPanel;
+    private JPanel breakdownPanel;
+    private ArrayList<JLabel> lblInfoList;
 
 
     private JPanel viewPanel;
@@ -50,6 +61,7 @@ public class ViewHotelPanel extends Panel {
             dateList[i-1] = i;
         cbDates = new JComboBox<Integer>(dateList);
         cbRoomNames = new JComboBox<String>();
+        lblInfoList = new ArrayList<JLabel>();
 
 
         JLabel lblViewHotel = new JLabel("View Hotel");
@@ -57,15 +69,20 @@ public class ViewHotelPanel extends Panel {
 
         viewHotelCardLayout = new CardLayout();
         viewPanel = new JPanel(viewHotelCardLayout);
+        breakdownPanel = new JPanel();
+        breakdownPanel.setLayout(new BoxLayout(breakdownPanel, BoxLayout.Y_AXIS));
+        reservationInfoPanel = infoPanel();
 
 
         JPanel hiLevel = viewHiLevel();
         JPanel roomsOnDate = viewRoomsOnDate();
         JPanel roomInfo = viewRoomInfo();
+        JPanel viewReservation = viewReservation();
 
         viewPanel.add(hiLevel, "hiLevel");
         viewPanel.add(roomsOnDate, "roomsOnDate");
         viewPanel.add(roomInfo, "roomInfo");
+        viewPanel.add(viewReservation, "reservation");
 
         viewHotelCardLayout.show(viewPanel, "hiLevel");
         this.add(viewPanel, BorderLayout.CENTER);
@@ -153,11 +170,86 @@ public class ViewHotelPanel extends Panel {
         panelFirst.add(selectRoom);
         panel.add(panelFirst);
 
+        //room info group
+        roomInfo = new JPanel();
+        roomInfo.setLayout(new BoxLayout(roomInfo, BoxLayout.Y_AXIS));
+        lblRoomName = new JLabel("Room Name: ");
+        roomInfo.add(lblRoomName);
+        lblRoomType = new JLabel("Room Type: ");
+        roomInfo.add(lblRoomType);
+        lblBasePrice = new JLabel("Base Price: ");
+        roomInfo.add(lblBasePrice);
+        JLabel lblAvailability = new JLabel("Dates Available: ");
+        roomInfo.add(lblAvailability);
+        panel.add(roomInfo);
 
+        roomInfo.setVisible(false);
 
         return panel;
 
     }
+    public void updateRoomInfo(String roomName, String roomType, double basePrice){
+        lblRoomName.setText("Room Name: " + roomName);
+        lblRoomType.setText("Room Type: " + roomType);
+        lblBasePrice.setText("Base Price: " + basePrice);
+
+        roomInfo.repaint();
+        roomInfo.revalidate();
+        roomInfo.setVisible(true);
+    }
+
+    public JPanel viewReservation(){
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+
+        //prompt
+        JPanel panelFirst = new JPanel(new FlowLayout());
+        JLabel lblPrompt = new JLabel("Enter Guest Name: ");
+        panelFirst.add(lblPrompt);
+        tfGuestName = new JTextField(20);
+        panelFirst.add(tfGuestName);
+        searchReservation = new JButton("Search Reservation");
+        panelFirst.add(searchReservation);
+        panel.add(panelFirst);
+
+        //reservationInfoPanel
+        reservationInfoPanel.setVisible(false);
+        panel.add(reservationInfoPanel);
+
+
+        return panel;
+    }
+
+    public JPanel infoPanel(){
+        JPanel infoPanel = new JPanel();
+        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
+        lblHotelName = new JLabel("Hotel Name: " + this.hotelName);
+        infoPanel.add(breakdownPanel);
+
+        return infoPanel;
+    }
+
+
+
+
+    public void updateInfoPanel(ArrayList<String> infoList){
+        this.lblInfoList.clear();
+        breakdownPanel.removeAll();
+        for(String line : infoList){
+            System.out.println(line);
+            this.lblInfoList.add(new JLabel(line));
+        }
+        for(JLabel label : lblInfoList){
+            breakdownPanel.add(label);
+        }
+
+        reservationInfoPanel.revalidate();
+        reservationInfoPanel.repaint();
+        reservationInfoPanel.setVisible(true);
+
+    }
+
+
 
 
     public void setActionListener(ActionListener listener) {
@@ -165,8 +257,12 @@ public class ViewHotelPanel extends Panel {
         viewRoomInfo.addActionListener(listener);
         viewReservation.addActionListener(listener);
 
+        selectRoom.addActionListener(listener);
+
         selectDate.addActionListener(listener);
+        searchReservation.addActionListener(listener);
     }
+
 
 
     public JLabel getLblHotelName() {
@@ -241,5 +337,12 @@ public class ViewHotelPanel extends Panel {
 
     public JButton getSelectRoom() {
         return selectRoom;
+    }
+    public String getTfGuestName(){
+        return  tfGuestName.getText();
+    }
+
+    public JPanel getReservationInfoPanel() {
+        return reservationInfoPanel;
     }
 }

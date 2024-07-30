@@ -16,6 +16,7 @@ public class tempCtr implements ActionListener, DocumentListener, ItemListener {
     private int bookedRoomIndex;
     private int bookedCheckInDate;
     private int bookedCheckOutDate;
+    private ArrayList<String> breakdownList = new ArrayList<>();
 
     public tempCtr(View view, HotelSystem hotelSystem) {
         this.view = view;
@@ -75,6 +76,18 @@ public class tempCtr implements ActionListener, DocumentListener, ItemListener {
         }
         if(e.getActionCommand().equals("View Room Info")){
             view.getViewHotelPanel().getViewHotelCardLayout().show(view.getViewHotelPanel().getViewPanel(), "roomInfo");
+        }
+        if(e.getActionCommand().equals("Select Room")){
+            viewRoomInfo();
+        }
+        if(e.getActionCommand().equals("View Reservation Info")){
+            view.getViewHotelPanel().getViewHotelCardLayout().show(view.getViewHotelPanel().getViewPanel(), "reservation");
+        }
+        if(e.getActionCommand().equals("Search Reservation")){
+            if(view.getCurrView() == 2)
+                viewReservationInfo();
+            else
+                removeReservation();
         }
         if(e.getActionCommand().equals("Change Name")){
             view.getManageHotelPanel().getManageCardLayout().show(view.getManageHotelPanel().getManagePanel(), "changeNamePanel");
@@ -166,6 +179,39 @@ public class tempCtr implements ActionListener, DocumentListener, ItemListener {
         view.getViewHotelPanel().getViewRODInfo().setVisible(true);
     }
 
+    public void viewRoomInfo(){
+        Hotel hotel = hotelSystem.getHotels().get(index);
+        String roomName = view.getViewHotelPanel().getCbRoomNames().getSelectedItem().toString();
+        String roomType = "";
+        double roomPrice;
+        int roomIndex = hotelSystem.searchRoom(hotel, roomName);
+        Room room = hotel.getRooms().get(roomIndex);
+
+        if(room instanceof Standard)
+            roomType = "Standard";
+        if(room instanceof Deluxe)
+            roomType = "Deluxe";
+        if(room instanceof Executive)
+            roomType = "Executive";
+        roomPrice = room.getPrice();
+
+        view.getViewHotelPanel().updateRoomInfo(roomName, roomType, roomPrice);
+    }
+
+    public void viewReservationInfo(){
+        Hotel hotel = hotelSystem.getHotels().get(index);
+        String guestName = view.getViewHotelPanel().getTfGuestName();
+        ArrayList<String> reserveInfo = new ArrayList<>();
+
+         reserveInfo = hotelSystem.reservationInfo(hotel, guestName);
+         if(reserveInfo == null){
+             System.out.println("no reservation info");
+         }
+         else{
+             view.getViewHotelPanel().updateInfoPanel(reserveInfo);
+         }
+    }
+
     public void changeName(){
         Hotel hotel = hotelSystem.getHotels().get(index);
         String newName = view.getManageHotelPanel().getTfNewName();
@@ -220,6 +266,12 @@ public class tempCtr implements ActionListener, DocumentListener, ItemListener {
         double modifier = Double.parseDouble(view.getManageHotelPanel().getTfNewPriceMod());
 
         hotelSystem.changeDateModifier(hotel, startDate, endDate, modifier);
+
+    }
+    public void removeReservation(){
+        Hotel hotel = hotelSystem.getHotels().get(index);
+        String guestName = view.getManageHotelPanel().getTfGuestName();
+
 
     }
 
@@ -313,7 +365,7 @@ public class tempCtr implements ActionListener, DocumentListener, ItemListener {
     }
 
     public void updateConfirmInfo(int bookedIndex){
-        ArrayList<String> roomBreakList;
+        breakdownList.clear();
         Hotel hotel = hotelSystem.getHotels().get(index);
         bookedCheckInDate = (int) view.getBookReservationPanel().getCbCheckIn().getSelectedItem();
         bookedCheckOutDate = (int) view.getBookReservationPanel().getCbCheckOut().getSelectedItem();
@@ -321,12 +373,12 @@ public class tempCtr implements ActionListener, DocumentListener, ItemListener {
 
 
         if(discCode.isEmpty()) {
-            roomBreakList = hotelSystem.breakdownList(hotel, bookedIndex, bookedCheckInDate, bookedCheckOutDate);
-            view.getBookReservationPanel().updateRoomBreakList(roomBreakList);
+            breakdownList = hotelSystem.breakdownList(hotel, bookedIndex, bookedCheckInDate, bookedCheckOutDate);
+            view.getBookReservationPanel().updateRoomBreakList(breakdownList);
         }
         else{
-            roomBreakList = hotelSystem.breakdownList(hotel, bookedIndex, bookedCheckInDate, bookedCheckOutDate, discCode);
-            view.getBookReservationPanel().updateRoomBreakList(roomBreakList);
+            breakdownList = hotelSystem.breakdownList(hotel, bookedIndex, bookedCheckInDate, bookedCheckOutDate, discCode);
+            view.getBookReservationPanel().updateRoomBreakList(breakdownList);
         }
 
         view.getBookReservationPanel().getBookReservationCardLayout().show(view.getBookReservationPanel().getBookReservationCard(), "confirmPanel");
@@ -339,7 +391,7 @@ public class tempCtr implements ActionListener, DocumentListener, ItemListener {
         String guestName = view.getBookReservationPanel().getTfGuestName();
         String discCode = view.getBookReservationPanel().getTfDiscountCode();
 
-        hotelSystem.book(hotel, guestName, bookedRoomIndex, bookedCheckInDate, bookedCheckOutDate, discCode);
+        hotelSystem.book(hotel, guestName, bookedRoomIndex, bookedCheckInDate, bookedCheckOutDate, discCode, breakdownList);
         System.out.println("Booking Added!");
         view.getBookReservationPanel().setRoomName(hotel.getRooms().get(bookedRoomIndex).getRoomName());
         view.getBookReservationPanel().getBookReservationCardLayout().show(view.getBookReservationPanel().getBookReservationCard(), "bookedDetailsPanel");

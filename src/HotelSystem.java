@@ -176,6 +176,45 @@ public class HotelSystem implements Discounts{
     }
 
     /**
+     * Searches and displays specific reservation information
+     * @param hotel hotel which will be checked
+     */
+    public ArrayList<String> reservationInfo(Hotel hotel, String guestName){
+        Reservation reservationInfo = null;
+        ArrayList<String> infoList = new ArrayList<>();
+        String roomType, roomName;
+        int checkInDate, checkOutDate;
+
+        for(Reservation reservation: hotel.getReservations()) //searches for the entered name
+            if(reservation.getGuestName().equalsIgnoreCase(guestName))
+                reservationInfo = reservation;  //assigns found reservation to temp attribute
+
+        if(reservationInfo == null) {
+            System.out.println("No reservation found\n"); //error message if no reservation was found
+            return infoList;
+        }
+        else{
+            if(reservationInfo.getRoom() instanceof Standard)
+                roomType = "Standard";
+            if(reservationInfo.getRoom() instanceof Deluxe)
+                roomType = "Deluxe";
+            else
+                roomType = "Executive";
+            roomName = reservationInfo.getRoom().getRoomName();
+            checkInDate = reservationInfo.getCheckInDate();
+            checkOutDate = reservationInfo.getCheckOutDate();
+            infoList = reservationInfo.getBreakdown();
+        }
+        infoList.add(0, "Breakdown per Night: ");
+        infoList.add(0, "Booked Dates: June" + checkInDate + ", 2024 - " + "June " + checkOutDate + ", 2024");
+        infoList.add(0, "Room Type: " + roomType);
+        infoList.add(0, "Room No: " + roomName);
+        infoList.add(0, "Guest Name: " + guestName);
+
+        return infoList;
+    }
+
+    /**
      * Changes the name of a hotel
      * @param hotel hotel which will update its name
      * @param newHotelName new name of the hotel
@@ -331,7 +370,7 @@ public class HotelSystem implements Discounts{
      * @param hotel hotel which will have a reservation removed
      * @param guestName name of guest under a reservation
      */
-    public void removeReservation(Hotel hotel, String guestName){
+    public boolean removeReservation(Hotel hotel, String guestName){
         int checkInDate = 0;
         int checkOutDate = 0;
         int i;
@@ -352,10 +391,11 @@ public class HotelSystem implements Discounts{
                 System.out.println(reservationToRemove.getGuestName() + " removed\n"); //confirmation message
                 for (i = checkInDate; i < checkOutDate; i++) //frees up occupancy on dates of the room assigned to the deleted reservation
                     hotel.getRooms().get(roomIndex).getDates()[i] = false;
+                return true;
             }
             else
                 System.out.println("Guest: " + guestName + " not found."); //error message if no reservation was found from guestName
-
+        return false;
     }
 
     /**
@@ -378,7 +418,7 @@ public class HotelSystem implements Discounts{
      * @param checkInDate date of checkIn
      * @param checkOutDate date of checkOut
      */
-    public void Book(Hotel hotel, String guestName, int checkInDate, int checkOutDate, int roomType){
+    public void Book(Hotel hotel, String guestName, int checkInDate, int checkOutDate, int roomType, ArrayList<String> breakdown){
         int roomIndex = findVacantRoom(hotel, checkInDate, checkOutDate, roomType);
         double guestPrice = 0;
         if(roomIndex == -1){ //checks in a vacant room is found
@@ -390,7 +430,7 @@ public class HotelSystem implements Discounts{
 
             }
 
-            Reservation reservation = new Reservation(guestName, checkInDate, checkOutDate, hotel.getRooms().get(roomIndex), guestPrice); //instantiates a reservation with given infro
+            Reservation reservation = new Reservation(guestName, checkInDate, checkOutDate, hotel.getRooms().get(roomIndex), guestPrice, breakdown); //instantiates a reservation with given infro
             hotel.addReservation(reservation);  //reservation is added to the hotel
             updateDates(hotel.getRooms().get(roomIndex), checkInDate, checkOutDate); //occupancy dates of room will be updated
             System.out.println("Confirmed. Your Room is: " + hotel.getRooms().get(roomIndex).getRoomName() + "\n"); //confirmation message
@@ -494,9 +534,9 @@ public class HotelSystem implements Discounts{
         return total;
     }
 
-    public void book(Hotel hotel, String guestName, int roomIndex, int checkInDate, int checkOutDate, String discCode){
+    public void book(Hotel hotel, String guestName, int roomIndex, int checkInDate, int checkOutDate, String discCode, ArrayList<String> breakdown){
         double totalPrice = getTotalPrice(hotel, roomIndex, checkInDate, checkOutDate, discCode);
-        Reservation newBooking = new Reservation(guestName, checkInDate, checkOutDate, hotel.getRooms().get(roomIndex), totalPrice);
+        Reservation newBooking = new Reservation(guestName, checkInDate, checkOutDate, hotel.getRooms().get(roomIndex), totalPrice, breakdown);
         hotel.addReservation(newBooking);
     }
 

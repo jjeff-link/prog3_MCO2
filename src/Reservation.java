@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  * Represents a reservation
  * @author Cumti
@@ -25,6 +27,8 @@ public class Reservation{
      */
     private final Room room;
 
+    private final ArrayList<String> breakdown;
+
     /**
      * Creates a reservation
      * @param guestName name of guest
@@ -32,12 +36,13 @@ public class Reservation{
      * @param checkOutDate date of check out
      * @param room room which is assigned to the reservation
      */
-    public Reservation(String guestName, int checkInDate, int checkOutDate, Room room, double guestPrice){
+    public Reservation(String guestName, int checkInDate, int checkOutDate, Room room, double guestPrice, ArrayList<String> breakdown){
         this.guestName = guestName;
         this.checkInDate = checkInDate;
         this.checkOutDate = checkOutDate;
         this.room = room;
         this.guestPrice = guestPrice;
+        this.breakdown = breakdown;
     }
 
     /**
@@ -80,4 +85,7 @@ public class Reservation{
         return room;
     }
 
+    public ArrayList<String> getBreakdown(){
+        return breakdown;
+    }
 }

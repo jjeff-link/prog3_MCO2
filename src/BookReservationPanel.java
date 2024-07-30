@@ -59,6 +59,8 @@ public class BookReservationPanel extends JPanel {
         cbCheckOut = new JComboBox<Integer>(checkOutDates);
         priceBreakdown = new ArrayList<JLabel>();
         roomName = new JLabel();
+        confirmBookBtn = new JButton("Confirm Booking");
+        cancelBookBtn = new JButton("Cancel Booking");
 
 
         JLabel lblBookReservation = new JLabel("Book Reservation");
@@ -68,13 +70,13 @@ public class BookReservationPanel extends JPanel {
         bookReservationCard = new JPanel(bookReservationCardLayout);
 
         promptPanel = promptPanel();
-        confirmPanel = confirmPanel();
-        bookedDetailsPanel = bookedDetailsPanel();
         infoPanel = infoPanel();
+        //confirmPanel = confirmPanel();
+        bookedDetailsPanel = bookedDetailsPanel();
         breakdownPanel = breakDownPanel();
 
         bookReservationCard.add(promptPanel, "promptPanel");
-        bookReservationCard.add(confirmPanel, "confirmPanel");
+        //bookReservationCard.add(confirmPanel, "confirmPanel");
         bookReservationCard.add(bookedDetailsPanel, "bookedDetailsPanel");
 
 
@@ -143,7 +145,7 @@ public class BookReservationPanel extends JPanel {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         //info panel
-        JPanel infoPanel = infoPanel();
+        infoPanel = infoPanel();
         panel.add(infoPanel);
 
         //confirmPrompt
@@ -151,9 +153,7 @@ public class BookReservationPanel extends JPanel {
         confirmBookPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         JLabel lblConfirmBooking = new JLabel("Confirm?");
         confirmBookPanel.add(lblConfirmBooking);
-        confirmBookBtn = new JButton("Confirm Booking");
         confirmBookPanel.add(confirmBookBtn);
-        cancelBookBtn = new JButton("Cancel Booking");
         confirmBookPanel.add(cancelBookBtn);
         panel.add(confirmBookPanel);
 
@@ -169,7 +169,7 @@ public class BookReservationPanel extends JPanel {
         panel.add(lblSuccess);
 
         //details
-        JPanel infoPanel = infoPanel();
+        infoPanel = infoPanel();
         panel.add(infoPanel);
         panel.add(roomName);
 
@@ -221,10 +221,16 @@ public class BookReservationPanel extends JPanel {
     }
 
     private void refreshConfirmPanel() {
-        confirmPanel.remove(infoPanel);
-        confirmPanel.add(infoPanel());
-        confirmPanel.revalidate();
-        confirmPanel.repaint();
+        infoPanel.removeAll();
+        infoPanel.add(infoPanel());
+        infoPanel.revalidate();
+        infoPanel.repaint();
+        confirmPanel = confirmPanel();
+        bookReservationCard.add(confirmPanel, "confirmPanel");
+//        confirmPanel.removeAll();
+//        confirmPanel.add(confirmPanel());
+//        confirmPanel.revalidate();
+//        confirmPanel.repaint();
     }
 
 
