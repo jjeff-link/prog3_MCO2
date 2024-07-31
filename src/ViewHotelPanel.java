@@ -183,6 +183,8 @@ public class ViewHotelPanel extends Panel {
         lblDateInfo.setText("Date: June " + chosenDate + ", 2024");
         lblBookedRooms.setText("Booked Rooms: " + bookedRooms);
         lblAvailableRooms.setText("Available Rooms: " + (roomCount - bookedRooms));
+        viewRoomsOnDate.repaint();
+        viewRoomsOnDate.revalidate();
     }
 
     public JPanel viewRoomInfo(){
@@ -302,15 +304,6 @@ public class ViewHotelPanel extends Panel {
         return panel;
     }
 
-    public void updateInfoPanel(){
-        JLabel notFoundMsg = new JLabel("Reservation Not Found");
-        notFoundMsg.setForeground(Color.RED);
-        reservationInfoPanel.removeAll();
-        reservationInfoPanel.add(notFoundMsg);
-        viewReservation.repaint();
-        viewReservation.revalidate();
-        reservationInfoPanel.setVisible(true);
-    }
 
     public void updateInfoPanel(ArrayList<String> infoList){
         this.lblInfoList.clear();
@@ -330,8 +323,6 @@ public class ViewHotelPanel extends Panel {
         reservationInfoPanel.add(breakdownPanel);
         reservationInfoPanel.repaint();
         reservationInfoPanel.revalidate();
-//        viewReservation.repaint();
-//        viewReservation.revalidate();
         reservationInfoPanel.setVisible(true);
     }
 
@@ -361,15 +352,6 @@ public class ViewHotelPanel extends Panel {
     }
     public JLabel getLblIncome() {
         return lblIncome;
-    }
-    public JButton getViewRoomsOnDate() {
-        return viewRoomsOnDate;
-    }
-    public JButton getViewRoomInfo() {
-        return viewRoomInfo;
-    }
-    public JButton getViewReservation() {
-        return viewReservation;
     }
     public JButton getSelectDate() {
         return selectDate;

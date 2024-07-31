@@ -27,6 +27,9 @@ public class Reservation{
      */
     private final Room room;
 
+    /**
+     * represents the price breakdown string/receipt for the reservation
+     */
     private final ArrayList<String> breakdown;
 
     /**
@@ -85,6 +88,10 @@ public class Reservation{
         return room;
     }
 
+    /**
+     * Getter method to get the price breakdown string of the reservation
+     * @return breakdown
+     * **/
     public ArrayList<String> getBreakdown(){
         return breakdown;
     }

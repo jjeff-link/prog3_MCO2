@@ -257,7 +257,7 @@ public class HotelSystem implements Discounts{
 
         if(reservationInfo == null) {
             System.out.println("No reservation found\n"); //error message if no reservation was found
-            return infoList;
+            return null;
         }
         else{
             if(reservationInfo.getRoom() instanceof Standard)
@@ -438,7 +438,7 @@ public class HotelSystem implements Discounts{
             return true;
         }
         else
-            System.out.println("Invalid input/Hotel has reservations\n");
+            System.out.println("Invalid decimal/date input or Hotel has reservations\n");
         return false;
     }
 

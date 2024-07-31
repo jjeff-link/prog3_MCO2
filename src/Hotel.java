@@ -17,7 +17,9 @@ public class Hotel {
      * represents the list of reservations in a hotel
      */
     private ArrayList<Reservation> reservations = new ArrayList<>();
-
+    /**
+     * represents the date-price modifier for each date in the hotel
+     */
     private double[] dateMultiplier = new double[31];
 
 
@@ -70,6 +72,10 @@ public class Hotel {
         return reservations;
     }
 
+    /**
+     * Getter method for dateMultiplier
+     * @return dateMultiplier
+     */
     public double[] getDateMultiplier() {
         return dateMultiplier;
     }
@@ -89,7 +95,11 @@ public class Hotel {
     public void addReservation(Reservation reservation) {
         reservations.add(reservation);
     }
-
+    /**
+     * Modifies the date-price modifier for a certain date
+     * @param index date which will be modifier
+     * @param multiplier the date-price multiplier
+     */
     public void setDateMultiplier(int index, double multiplier) {
         this.dateMultiplier[index] = multiplier;
     }

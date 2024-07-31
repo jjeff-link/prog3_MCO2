@@ -5,7 +5,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemListener;
 import java.util.ArrayList;
 
-public class View extends JFrame {
+public class MainGUI extends JFrame {
     private JButton createHotelBtn;
     private JButton viewHotelBtn;
     private JButton manageHotelBtn;
@@ -33,7 +33,7 @@ public class View extends JFrame {
 
     private int currView;
 
-    public View(){
+    public MainGUI(){
         super("Hotel Reservation");
         setLayout(new BorderLayout());
 

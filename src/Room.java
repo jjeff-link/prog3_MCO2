@@ -1,4 +1,4 @@
-/** Represents a Room
+/** Abstract Class for a Room
  * @author Cumti
  * @author Escano
  */
