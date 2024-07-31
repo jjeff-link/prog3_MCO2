@@ -1,3 +1,4 @@
+import java.awt.datatransfer.StringSelection;
 import java.util.ArrayList;
 
 /** Represents a Hotel System
@@ -148,15 +149,16 @@ public class HotelSystem implements Discounts{
      * Adds a new hotel to hotels Arraylist given a unique name
      * @param hotelName unique hotel name for new hotel
      */
-    public void addHotel(String hotelName) {
+    public boolean addHotel(String hotelName) {
         if(searchHotel(hotelName) == -1) { //if no hotel has the same name
             Hotel hotel = new Hotel(hotelName); //instantiates a new hotel with the given name
             hotels.add(hotel);                     //adds this new hotel to hotels Arraylist
-            System.out.println("Hotel added: " + hotelName + "\n"); //Confirmation message
+            System.out.println("Hotel added: " + hotelName + "\n");//Confirmation message
+            return true;
         }
         else
             System.out.println("Hotel already exists\n"); //if an existing hotel has the same name
-
+        return false;
     }
 
     /**
@@ -175,6 +177,69 @@ public class HotelSystem implements Discounts{
         return bookedRooms;
     }
 
+    public ArrayList<String> getRoomDates(Hotel hotel, int roomIndex){
+        ArrayList<String> dates = new ArrayList<>();
+        Room room = hotel.getRooms().get(roomIndex);
+
+        for(int i = 0; i < room.getDates().length - 1; i++){
+            if(room.getDates()[i])
+                dates.add("June " + (i+1) + " - June " + (i+2) + "-> Occupied");
+            else
+                dates.add("June " + (i+1) + " - June " + (i+2) + "-> Vacant");
+        }
+        return dates;
+    }
+    public ArrayList<String> getHotelDates(Hotel hotel, int roomType){
+        ArrayList<String> dates = new ArrayList<>();
+        int roomCount = 0;
+        int bookedRooms;
+        boolean[] hotelAvail = new boolean[31];
+
+        for(Room room : hotel.getRooms()){
+            if(roomType == 1 && room instanceof Standard){
+                roomCount++;
+            }
+            if(roomType == 2 && room instanceof Deluxe){
+                roomCount++;
+            }
+            if(roomType == 3 || room instanceof Executive){
+                roomCount++;
+            }
+        }
+        if(roomCount == 0){
+            dates.add("No Room Found");
+            return dates;
+        }
+
+        for(int i = 0; i < 31; i++)
+            hotelAvail[i] = false;
+
+        for(int i = 0; i < 31; i++) {
+            bookedRooms = 0;
+            for (Room room : hotel.getRooms()) {
+                if ((roomType == 1 && room instanceof Standard) &&(room.getDates()[i])){
+                        bookedRooms++;
+                }
+                if((roomType == 2 && room instanceof Deluxe) &&(room.getDates()[i])){
+                    bookedRooms++;
+                }
+                if((roomType == 3 && room instanceof Executive) &&(room.getDates()[i])){
+                    bookedRooms++;
+                }
+            }
+            if(bookedRooms == roomCount)
+                hotelAvail[i] = true;
+        }
+
+        for(int i = 0; i < 31 - 1; i++){
+            if(hotelAvail[i])
+                dates.add("June " + (i+1) + " - June " + (i+2) + "-> Occupied");
+            else
+                dates.add("June " + (i+1) + " - June " + (i+2) + "-> Vacant");
+        }
+        return dates;
+    }
+
     /**
      * Searches and displays specific reservation information
      * @param hotel hotel which will be checked
@@ -182,7 +247,8 @@ public class HotelSystem implements Discounts{
     public ArrayList<String> reservationInfo(Hotel hotel, String guestName){
         Reservation reservationInfo = null;
         ArrayList<String> infoList = new ArrayList<>();
-        String roomType, roomName;
+        String roomType = "";
+        String roomName;
         int checkInDate, checkOutDate;
 
         for(Reservation reservation: hotel.getReservations()) //searches for the entered name
@@ -198,7 +264,7 @@ public class HotelSystem implements Discounts{
                 roomType = "Standard";
             if(reservationInfo.getRoom() instanceof Deluxe)
                 roomType = "Deluxe";
-            else
+            if(reservationInfo.getRoom() instanceof Executive)
                 roomType = "Executive";
             roomName = reservationInfo.getRoom().getRoomName();
             checkInDate = reservationInfo.getCheckInDate();
@@ -206,7 +272,7 @@ public class HotelSystem implements Discounts{
             infoList = reservationInfo.getBreakdown();
         }
         infoList.add(0, "Breakdown per Night: ");
-        infoList.add(0, "Booked Dates: June" + checkInDate + ", 2024 - " + "June " + checkOutDate + ", 2024");
+        infoList.add(0, "Booked Dates: June " + checkInDate + ", 2024 - " + "June " + checkOutDate + ", 2024");
         infoList.add(0, "Room Type: " + roomType);
         infoList.add(0, "Room No: " + roomName);
         infoList.add(0, "Guest Name: " + guestName);
@@ -219,14 +285,17 @@ public class HotelSystem implements Discounts{
      * @param hotel hotel which will update its name
      * @param newHotelName new name of the hotel
      */
-    public void changeHotelName(Hotel hotel, String newHotelName) {
+    public boolean changeHotelName(Hotel hotel, String newHotelName) {
         if (searchHotel(newHotelName) == -1) { //checks if no hotel has the same name
             hotel.setHotelName(newHotelName);   //uses setter method to change name of hotel
-            System.out.println("Hotel changed to " + newHotelName + "\n"); //confirmation message
+            System.out.println("Hotel changed to " + newHotelName + "\n");//confirmation message
+            return true;
         }
         else
             System.out.println("Hotel already exists\n"); //returns error message if hotelName is taken
+        return false;
     }
+
 
 
     /**
@@ -234,13 +303,17 @@ public class HotelSystem implements Discounts{
      * @param hotel hotel which a new room will be added
      * @param nRooms amount of rooms to add
      */
-    public void addRoom(Hotel hotel, int nRooms, int roomType){
+    public boolean addRoom(Hotel hotel, int nRooms, int roomType){
         int i;
 
-        if(hotel.getRooms().size() + nRooms > 50) //checks if the added rooms will exceed 50 (maximum rooms in hotel)
+        if(hotel.getRooms().size() + nRooms > 50) { //checks if the added rooms will exceed 50 (maximum rooms in hotel)
             System.out.println("Maximum number of rooms exceeded\n"); //error message
-        else if(nRooms <= 0)
+            return false;
+        }
+        else if(nRooms <= 0) {
             System.out.println("Invalid input\n");
+            return false;
+        }
         else {
             for (i = 0; i < nRooms; i++) {
                 if(roomType == 1) {
@@ -258,6 +331,7 @@ public class HotelSystem implements Discounts{
             }
             System.out.println("Rooms added: " + nRooms + "\n"); //confirmation message
         }
+        return true;
     }
 
     /**
@@ -335,7 +409,7 @@ public class HotelSystem implements Discounts{
      * @param hotel hotel to update room prices
      * @param newPrice newly set price to the rooms
      */
-    public void updatePrice(Hotel hotel, double newPrice){
+    public boolean updatePrice(Hotel hotel, double newPrice){
         boolean validPrice = newPrice >= 100;
 
         if (hotel.getReservations().isEmpty() && validPrice){ //checks if hotel has no reservations
@@ -343,6 +417,7 @@ public class HotelSystem implements Discounts{
                 room.setPrice(newPrice); //adds price to room
             }
             System.out.println("Price updated\nPrice: P " + hotel.getRooms().get(0).getPrice() + "\n"); //confirmation message
+            return true;
         }
         else {
             if(!validPrice)
@@ -350,20 +425,55 @@ public class HotelSystem implements Discounts{
             else
                 System.out.println("A room is reserved. Price change is unavailable.\n"); //if hotel has a reservation
         }
+        return false;
     }
 
-    public void changeDateModifier(Hotel hotel, int startDate, int endDate, double modifier){
-        boolean valid = endDate > startDate;
+    public boolean changeDateModifier(Hotel hotel, int startDate, int endDate, double modifier){
+        boolean valid = (hotel.getReservations().isEmpty()) && (endDate > startDate);
 
         if(modifier >= 0.5 && modifier <= 1.50 && valid) {
             for (int i = startDate - 1; i < endDate - 1; i++) {
                 hotel.setDateMultiplier(i, modifier);
             }
+            return true;
         }
         else
-            System.out.println("Invalid input\n");
+            System.out.println("Invalid input/Hotel has reservations\n");
+        return false;
     }
 
+    public boolean searchReservation(Hotel hotel, String guestName, ArrayList<String> reservationInfo){
+        Reservation foundReservation = null;
+        int checkInDate = 0;
+        int checkOutDate = 0;
+        String roomType = "";
+        String roomName;
+        for(Reservation reservation : hotel.getReservations()) { //gets reservation information from guestName
+            if (reservation.getGuestName().equalsIgnoreCase(guestName)) {
+                foundReservation = reservation;
+            }
+        }
+        if(foundReservation == null)
+            return false;
+
+        if(foundReservation.getRoom() instanceof Standard)
+            roomType = "Standard";
+        if(foundReservation.getRoom() instanceof Deluxe)
+            roomType = "Deluxe";
+        if(foundReservation.getRoom() instanceof Deluxe)
+            roomType = "Executive";
+        roomName = foundReservation.getRoom().getRoomName();
+        checkInDate = foundReservation.getCheckInDate();
+        checkOutDate = foundReservation.getCheckOutDate();
+
+        reservationInfo.add("Guest Name: " + foundReservation.getGuestName() + "\n");
+        reservationInfo.add("Booked Dates: June" + checkInDate + ", 2024 - " + "June " + checkOutDate + ", 2024");
+        reservationInfo.add("Room Type: " + roomType);
+        reservationInfo.add("Room No: " + roomName);
+
+
+        return true;
+    }
 
     /**
      * Removes a reservation in a hotel
@@ -403,39 +513,12 @@ public class HotelSystem implements Discounts{
      * @param hotel hotel to be removed
      */
     public void removeHotel(Hotel hotel) {
-        if (hotel.getReservations().isEmpty()) { //checks if no active reservations are in the hotel
-            System.out.println("Hotel " + hotel.getHotelName() + " removed\n"); //confirmation message
-            hotels.remove(hotel); //hotel is removed from list
-        }
-        else
-            System.out.println("Hotel cannot be removed. There are reservations.\n"); //error message if a reservation is present
+        System.out.println("Hotel " + hotel.getHotelName() + " removed\n"); //confirmation message
+        hotels.remove(hotel); //hotel is removed from list
     }
 
-    /**
-     * Simulates booking
-     * @param hotel hotel wherein a reservation will be made
-     * @param guestName name of guest under the reservation
-     * @param checkInDate date of checkIn
-     * @param checkOutDate date of checkOut
-     */
-    public void Book(Hotel hotel, String guestName, int checkInDate, int checkOutDate, int roomType, ArrayList<String> breakdown){
-        int roomIndex = findVacantRoom(hotel, checkInDate, checkOutDate, roomType);
-        double guestPrice = 0;
-        if(roomIndex == -1){ //checks in a vacant room is found
-            System.out.println("Unavailable Room\n"); //error message if not vacant rooms are available
-        }
-        else {
-            for(int i = checkInDate; i < checkOutDate; i++){
-                guestPrice += hotel.getDateMultiplier()[i - 1] * hotel.getRooms().get(roomIndex).getPrice();
 
-            }
 
-            Reservation reservation = new Reservation(guestName, checkInDate, checkOutDate, hotel.getRooms().get(roomIndex), guestPrice, breakdown); //instantiates a reservation with given infro
-            hotel.addReservation(reservation);  //reservation is added to the hotel
-            updateDates(hotel.getRooms().get(roomIndex), checkInDate, checkOutDate); //occupancy dates of room will be updated
-            System.out.println("Confirmed. Your Room is: " + hotel.getRooms().get(roomIndex).getRoomName() + "\n"); //confirmation message
-        }
-    }
 
     public ArrayList<String> breakdownList(Hotel hotel, int roomIndex, int checkInDate, int checkOutDate){
         String roomItem;
@@ -534,10 +617,18 @@ public class HotelSystem implements Discounts{
         return total;
     }
 
+    /**
+     * Simulates booking
+     * @param hotel hotel wherein a reservation will be made
+     * @param guestName name of guest under the reservation
+     * @param checkInDate date of checkIn
+     * @param checkOutDate date of checkOut
+     */
     public void book(Hotel hotel, String guestName, int roomIndex, int checkInDate, int checkOutDate, String discCode, ArrayList<String> breakdown){
         double totalPrice = getTotalPrice(hotel, roomIndex, checkInDate, checkOutDate, discCode);
         Reservation newBooking = new Reservation(guestName, checkInDate, checkOutDate, hotel.getRooms().get(roomIndex), totalPrice, breakdown);
         hotel.addReservation(newBooking);
+        updateDates(hotel.getRooms().get(roomIndex), checkInDate, checkOutDate);
     }
 
 

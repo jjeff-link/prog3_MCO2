@@ -32,11 +32,15 @@ public class ViewHotelPanel extends Panel {
     private JLabel lblRoomName;
     private JLabel lblRoomType;
     private JLabel lblBasePrice;
+    private ArrayList<JLabel> lblDatesList;
+    private JScrollPane dateScroll;
+    private JPanel datesPanel;
 
 
 
     private JTextField tfGuestName;
-    private JButton searchReservation;;
+    private JLabel lblRsrvHotelName;
+    private JButton searchReservation;
     private JPanel reservationInfoPanel;
     private JPanel breakdownPanel;
     private ArrayList<JLabel> lblInfoList;
@@ -62,16 +66,21 @@ public class ViewHotelPanel extends Panel {
         cbDates = new JComboBox<Integer>(dateList);
         cbRoomNames = new JComboBox<String>();
         lblInfoList = new ArrayList<JLabel>();
+        lblDatesList = new ArrayList<JLabel>();
+        datesPanel = new JPanel();
+        hotelName = "";
 
 
         JLabel lblViewHotel = new JLabel("View Hotel");
+        lblViewHotel.setFont(new Font("Arial", Font.BOLD, 18));
+        lblViewHotel.setHorizontalAlignment(SwingConstants.CENTER);
         this.add(lblViewHotel, BorderLayout.NORTH);
 
         viewHotelCardLayout = new CardLayout();
         viewPanel = new JPanel(viewHotelCardLayout);
         breakdownPanel = new JPanel();
         breakdownPanel.setLayout(new BoxLayout(breakdownPanel, BoxLayout.Y_AXIS));
-        reservationInfoPanel = infoPanel();
+
 
 
         JPanel hiLevel = viewHiLevel();
@@ -91,62 +100,81 @@ public class ViewHotelPanel extends Panel {
     public JPanel viewHiLevel(){
         JPanel viewHiLevelPanel = new JPanel();
         viewHiLevelPanel.setLayout(new BoxLayout(viewHiLevelPanel, BoxLayout.Y_AXIS));
+        viewHiLevelPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+
         lblHotelName = new JLabel("Hotel Name: " + hotelName);
-        viewHiLevelPanel.add(lblHotelName);
+        setFontAndStyle(lblHotelName, 14, Font.PLAIN);
         lblRooms = new JLabel("No of Rooms: " + roomCount);
-        viewHiLevelPanel.add(lblRooms);
+        setFontAndStyle(lblRooms, 14, Font.PLAIN);
         lblIncome = new JLabel("Total Income: " + income);
-        viewHiLevelPanel.add(lblIncome);
+        setFontAndStyle(lblIncome, 14, Font.PLAIN);
 
         viewRoomsOnDate = new JButton("View Available Rooms on Date");
-        viewHiLevelPanel.add(viewRoomsOnDate);
         viewRoomInfo = new JButton("View Room Info");
-        viewHiLevelPanel.add(viewRoomInfo);
         viewReservation = new JButton("View Reservation Info");
-        viewHiLevelPanel.add(viewReservation);
 
+        setFontAndStyle(viewRoomsOnDate, 12, Font.PLAIN);
+        setFontAndStyle(viewRoomInfo, 12, Font.PLAIN);
+        setFontAndStyle(viewReservation, 12, Font.PLAIN);
+
+        viewHiLevelPanel.add(lblHotelName);
+        viewHiLevelPanel.add(lblRooms);
+        viewHiLevelPanel.add(lblIncome);
+        viewHiLevelPanel.add(Box.createVerticalStrut(10)); // Spacing between labels and buttons
+        viewHiLevelPanel.add(viewRoomsOnDate);
+        viewHiLevelPanel.add(viewRoomInfo);
+        viewHiLevelPanel.add(viewReservation);
 
         return viewHiLevelPanel;
     }
 
     public void updateViewHiLevel(String hotelName, int roomCount, double income) {
-        lblHotelName.setText("Hotel Name: " + hotelName);
+        this.hotelName = hotelName;
+        lblHotelName.setText("Hotel Name: " + this.hotelName);
         lblRooms.setText("No of Rooms: " + roomCount);
         lblIncome.setText("Total Income: " + income);
+
+        lblHotelName.getParent().repaint();
+        lblHotelName.getParent().revalidate();
     }
 
     public JPanel viewRoomsOnDate(){
         JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
-
-        //FlowGroup
-        JPanel panelFirst = new JPanel(new FlowLayout());
+        JPanel panelFirst = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel lblPrompt = new JLabel("Select a Date: ");
+        setFontAndStyle(lblPrompt, 14, Font.PLAIN);
         panelFirst.add(lblPrompt);
-        JLabel lblDate = new JLabel("June");
-        panelFirst.add(lblDate);
-
         panelFirst.add(cbDates);
-
-        panel.add(panelFirst);
-
-        //selectButton
         selectDate = new JButton("Select Date");
-        panel.add(selectDate);
+        setFontAndStyle(selectDate, 12, Font.PLAIN);
+        panelFirst.add(selectDate);
 
-        //InfoGroup
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.anchor = GridBagConstraints.CENTER;
+        panel.add(panelFirst, gbc);
+
         viewRODInfo = new JPanel();
         viewRODInfo.setLayout(new BoxLayout(viewRODInfo, BoxLayout.Y_AXIS));
         lblDateInfo = new JLabel("Date: June " + chosenDate + ", 2024");
-        viewRODInfo.add(lblDateInfo);
+        setFontAndStyle(lblDateInfo, 14, Font.PLAIN);
         lblBookedRooms = new JLabel("Booked Rooms: " + bookedRooms);
-        viewRODInfo.add(lblBookedRooms);
+        setFontAndStyle(lblBookedRooms, 14, Font.PLAIN);
         lblAvailableRooms = new JLabel("Available Rooms: " + (roomCount - bookedRooms));
+        setFontAndStyle(lblAvailableRooms, 14, Font.PLAIN);
+        viewRODInfo.add(lblDateInfo);
+        viewRODInfo.add(lblBookedRooms);
         viewRODInfo.add(lblAvailableRooms);
-        panel.add(viewRODInfo);
 
         viewRODInfo.setVisible(false);
+
+        gbc.gridy = 1;
+        panel.add(viewRODInfo, gbc);
 
         return panel;
     }
@@ -161,38 +189,73 @@ public class ViewHotelPanel extends Panel {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
-        //FlowGroup
-        JPanel panelFirst = new JPanel(new FlowLayout());
+        JPanel panelFirst = new JPanel(new FlowLayout(FlowLayout.LEFT));
         JLabel lblPrompt = new JLabel("Select a Room: ");
+        setFontAndStyle(lblPrompt, 14, Font.PLAIN);
         panelFirst.add(lblPrompt);
         panelFirst.add(cbRoomNames);
         selectRoom = new JButton("Select Room");
+        setFontAndStyle(selectRoom, 12, Font.PLAIN);
         panelFirst.add(selectRoom);
         panel.add(panelFirst);
 
-        //room info group
         roomInfo = new JPanel();
         roomInfo.setLayout(new BoxLayout(roomInfo, BoxLayout.Y_AXIS));
+        roomInfo.setBorder(BorderFactory.createTitledBorder("Room Information"));
+        roomInfo.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
         lblRoomName = new JLabel("Room Name: ");
+        setFontAndStyle(lblRoomName, 14, Font.PLAIN);
         roomInfo.add(lblRoomName);
         lblRoomType = new JLabel("Room Type: ");
+        setFontAndStyle(lblRoomType, 14, Font.PLAIN);
         roomInfo.add(lblRoomType);
         lblBasePrice = new JLabel("Base Price: ");
+        setFontAndStyle(lblBasePrice, 14, Font.PLAIN);
         roomInfo.add(lblBasePrice);
         JLabel lblAvailability = new JLabel("Dates Available: ");
+        setFontAndStyle(lblAvailability, 14, Font.PLAIN);
         roomInfo.add(lblAvailability);
+
+        datesPanel = new JPanel();
+        datesPanel.setLayout(new BoxLayout(datesPanel, BoxLayout.Y_AXIS));
+        datesPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
+        dateScroll = new JScrollPane(datesPanel);
+        dateScroll.setBorder(BorderFactory.createEmptyBorder());
+        dateScroll.setPreferredSize(new Dimension(300, 200));
+
+        roomInfo.add(dateScroll);
+
         panel.add(roomInfo);
 
         roomInfo.setVisible(false);
 
         return panel;
-
     }
-    public void updateRoomInfo(String roomName, String roomType, double basePrice){
+
+
+
+    public void updateRoomInfo(String roomName, String roomType, double basePrice, ArrayList<String> dates){
         lblRoomName.setText("Room Name: " + roomName);
         lblRoomType.setText("Room Type: " + roomType);
         lblBasePrice.setText("Base Price: " + basePrice);
 
+        lblDatesList.clear();
+        datesPanel.removeAll();
+        datesPanel.repaint();
+        datesPanel.revalidate();
+        for(String line : dates){
+            this.lblDatesList.add(new JLabel(line));
+        }
+        for(JLabel label : lblDatesList){
+            datesPanel.add(label);
+        }
+
+        datesPanel.repaint();
+        datesPanel.revalidate();
+
+        //roomInfo.removeAll();
         roomInfo.repaint();
         roomInfo.revalidate();
         roomInfo.setVisible(true);
@@ -200,56 +263,81 @@ public class ViewHotelPanel extends Panel {
 
     public JPanel viewReservation(){
         JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.anchor = GridBagConstraints.CENTER;
 
-        //prompt
-        JPanel panelFirst = new JPanel(new FlowLayout());
+        // Prompt and input field
+        JPanel panelFirst = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JLabel lblPrompt = new JLabel("Enter Guest Name: ");
+        setFontAndStyle(lblPrompt, 14, Font.PLAIN);
         panelFirst.add(lblPrompt);
         tfGuestName = new JTextField(20);
         panelFirst.add(tfGuestName);
         searchReservation = new JButton("Search Reservation");
+        setFontAndStyle(searchReservation, 12, Font.PLAIN);
         panelFirst.add(searchReservation);
-        panel.add(panelFirst);
 
-        //reservationInfoPanel
+        gbc.gridy = 0;
+        panel.add(panelFirst, gbc);
+
+        // Reservation info panel
+        reservationInfoPanel = new JPanel();
+        reservationInfoPanel.setLayout(new BoxLayout(reservationInfoPanel, BoxLayout.Y_AXIS));
+        reservationInfoPanel.setBorder(BorderFactory.createTitledBorder("Reservation Information"));
+        reservationInfoPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        lblRsrvHotelName = new JLabel("Hotel Name: " + this.hotelName);
+        setFontAndStyle(lblHotelName, 14, Font.PLAIN);
+        reservationInfoPanel.add(lblRsrvHotelName);
+        reservationInfoPanel.add(breakdownPanel);
+
+        gbc.gridy = 1;
+        panel.add(reservationInfoPanel, gbc);
+
         reservationInfoPanel.setVisible(false);
-        panel.add(reservationInfoPanel);
-
 
         return panel;
     }
 
-    public JPanel infoPanel(){
-        JPanel infoPanel = new JPanel();
-        infoPanel.setLayout(new BoxLayout(infoPanel, BoxLayout.Y_AXIS));
-        lblHotelName = new JLabel("Hotel Name: " + this.hotelName);
-        infoPanel.add(breakdownPanel);
-
-        return infoPanel;
+    public void updateInfoPanel(){
+        JLabel notFoundMsg = new JLabel("Reservation Not Found");
+        notFoundMsg.setForeground(Color.RED);
+        reservationInfoPanel.removeAll();
+        reservationInfoPanel.add(notFoundMsg);
+        viewReservation.repaint();
+        viewReservation.revalidate();
+        reservationInfoPanel.setVisible(true);
     }
-
-
-
 
     public void updateInfoPanel(ArrayList<String> infoList){
         this.lblInfoList.clear();
         breakdownPanel.removeAll();
+        reservationInfoPanel.removeAll();
+        reservationInfoPanel.add(lblHotelName);
         for(String line : infoList){
             System.out.println(line);
             this.lblInfoList.add(new JLabel(line));
         }
+
         for(JLabel label : lblInfoList){
             breakdownPanel.add(label);
         }
 
-        reservationInfoPanel.revalidate();
-        reservationInfoPanel.repaint();
-        reservationInfoPanel.setVisible(true);
 
+        reservationInfoPanel.add(breakdownPanel);
+        reservationInfoPanel.repaint();
+        reservationInfoPanel.revalidate();
+//        viewReservation.repaint();
+//        viewReservation.revalidate();
+        reservationInfoPanel.setVisible(true);
     }
 
-
+    private void setFontAndStyle(JComponent component, int fontSize, int fontStyle) {
+        component.setFont(new Font("Arial", fontStyle, fontSize));
+    }
 
 
     public void setActionListener(ActionListener listener) {

@@ -6,16 +6,19 @@ import java.awt.event.ItemListener;
 import java.util.ArrayList;
 
 public class View extends JFrame {
-    JButton createHotelBtn;
-    JButton viewHotelBtn;
-    JButton manageHotelBtn;
-    JButton bookReservationBtn;
-    JButton backButton;
-    JButton addHotelBtn;
-    JButton searchHotelBtn;
+    private JButton createHotelBtn;
+    private JButton viewHotelBtn;
+    private JButton manageHotelBtn;
+    private JButton bookReservationBtn;
+    private JButton exitBtn;
+    private JButton backButton;
+    private JButton addHotelBtn;
+    private JButton searchHotelBtn;
     private JTextField tfHotelName;
-    JComboBox cbHotelNames;
+    private JComboBox cbHotelNames;
     public ArrayList<String> hotelNames = new ArrayList<String>();
+
+    private JPanel createPanel;
 
 
     private CardLayout mainCardLayout;
@@ -25,6 +28,8 @@ public class View extends JFrame {
     private ManageHotelPanel manageHotelPanel;
     private BookReservationPanel bookReservationPanel;
 
+    private JOptionPane errorMessage;
+    private JOptionPane confirmMessage;
 
     private int currView;
 
@@ -49,13 +54,12 @@ public class View extends JFrame {
         JPanel bottomMenu = bottomMenuPanel();
 
 
-
         mainCardLayout = new CardLayout();
         mainCardPanel = new JPanel(mainCardLayout);
         mainCardPanel.setSize(450, 300);
 
         JPanel mainView = mainView();
-        JPanel createPanel = createHotelPanel();
+        createPanel = createHotelPanel();
         viewHotelPanel = new ViewHotelPanel();
         manageHotelPanel = new ManageHotelPanel();
         bookReservationPanel = new BookReservationPanel();
@@ -78,20 +82,28 @@ public class View extends JFrame {
 
     public JPanel bottomMenuPanel(){
         JPanel bottomMenu = new JPanel();
-        bottomMenu.setLayout(new FlowLayout());
+        bottomMenu.setLayout(new FlowLayout()); // Reduced horizontal gap to 10
         bottomMenu.setBackground(Color.decode("#A9927D"));
-
 
         createHotelBtn = new JButton("Create Hotel");
         viewHotelBtn = new JButton("View Hotel");
         manageHotelBtn = new JButton("Manage Hotel");
         bookReservationBtn = new JButton("Book Reservation");
+        exitBtn = new JButton("Shutdown");
+
+        // Set button sizes and add to panel
+        Dimension buttonSize = new Dimension(115, 40); // Adjust size as needed
+        createHotelBtn.setPreferredSize(buttonSize);
+        viewHotelBtn.setPreferredSize(buttonSize);
+        manageHotelBtn.setPreferredSize(buttonSize);
+        bookReservationBtn.setPreferredSize(buttonSize);
+        exitBtn.setPreferredSize(buttonSize);
 
         bottomMenu.add(createHotelBtn);
         bottomMenu.add(viewHotelBtn);
         bottomMenu.add(manageHotelBtn);
         bottomMenu.add(bookReservationBtn);
-
+        bottomMenu.add(exitBtn);
 
         return bottomMenu;
     }
@@ -100,85 +112,109 @@ public class View extends JFrame {
 
     public JPanel mainView(){
         JPanel mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setLayout(new BorderLayout());
 
-
-        JLabel lblWelcome = new JLabel("Welcome!");
-        mainPanel.add(lblWelcome);
-
-        JLabel lblHRS = new JLabel("Hotel Reservation System v1.0");
-        mainPanel.add(lblHRS);
-
-        JLabel authors = new JLabel("by Cumti & Escano");
-        mainPanel.add(authors);
-
-
-
-        //center Panel
+        // Center panel with BoxLayout for vertical alignment
         JPanel panelCenter = new JPanel();
         panelCenter.setLayout(new BoxLayout(panelCenter, BoxLayout.Y_AXIS));
+        panelCenter.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        // Create labels
+        JLabel lblWelcome = new JLabel("Welcome!");
+        JLabel lblHRS = new JLabel("Hotel Reservation System v1.0");
+        JLabel authors = new JLabel("by Cumti & Escano");
 
+        setFontAndStyle(lblWelcome);
+        setFontAndStyle(lblHRS);
+        setFontAndStyle(lblHRS);
+
+        // Center the labels horizontally
+        lblWelcome.setAlignmentX(Component.CENTER_ALIGNMENT);
+        lblHRS.setAlignmentX(Component.CENTER_ALIGNMENT);
+        authors.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Add vertical glue to center labels vertically in the panelCenter
+        panelCenter.add(Box.createVerticalGlue());
+        panelCenter.add(lblWelcome);
+        panelCenter.add(Box.createVerticalStrut(10));
+        panelCenter.add(lblHRS);
+        panelCenter.add(Box.createVerticalStrut(10));
+        panelCenter.add(authors);
+        panelCenter.add(Box.createVerticalGlue());
+
+        // Add the centered panelCenter to the mainPanel
         mainPanel.add(panelCenter, BorderLayout.CENTER);
-        return mainPanel;
 
+        return mainPanel;
     }
 
     public JPanel createHotelPanel(){
         JPanel createPanel = new JPanel();
         createPanel.setLayout(new BorderLayout());
 
-        //NorthPanel
+        // North panel with the label
         JPanel panelNorth = new JPanel();
-        panelNorth.setLayout(new FlowLayout());
+        panelNorth.setLayout(new FlowLayout(FlowLayout.CENTER));
         JLabel lblHotelName = new JLabel("Create New Hotel");
+        lblHotelName.setFont(new Font("Arial", Font.BOLD, 24));
+        lblHotelName.setHorizontalAlignment(SwingConstants.CENTER);
         panelNorth.add(lblHotelName);
-
         createPanel.add(panelNorth, BorderLayout.NORTH);
 
-        //CenterPanel
+        // Center panel with text field and button
         JPanel panelCenter = new JPanel();
         panelCenter.setLayout(new BoxLayout(panelCenter, BoxLayout.Y_AXIS));
+        panelCenter.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20)); // Add padding
 
         JPanel detailsPanel = new JPanel();
-        detailsPanel.setLayout(new FlowLayout());
+        detailsPanel.setLayout(new FlowLayout(FlowLayout.LEFT)); // Align text field to the left
         JLabel lblWelcome = new JLabel("Enter Hotel Name: ");
-        detailsPanel.add(lblWelcome);
+        setFontAndStyle(lblWelcome);
         tfHotelName = new JTextField(20);
+        detailsPanel.add(lblWelcome);
         detailsPanel.add(tfHotelName);
 
         addHotelBtn = new JButton("Add Hotel");
 
+        // Add components to panelCenter
         panelCenter.add(detailsPanel);
+        panelCenter.add(Box.createVerticalStrut(10)); // Space between text field and button
         panelCenter.add(addHotelBtn);
 
-        createPanel.add(panelCenter, BorderLayout.CENTER);
+        // Center panel
+        JPanel centerContainer = new JPanel(new BorderLayout());
+        centerContainer.add(panelCenter, BorderLayout.CENTER);
+        createPanel.add(centerContainer, BorderLayout.CENTER);
 
-
-        //SouthPanel
+        // South panel with back button
         JPanel panelSouth = new JPanel();
-        panelSouth.setLayout(new FlowLayout());
+        panelSouth.setLayout(new FlowLayout(FlowLayout.CENTER));
         backButton = new JButton("Back");
         panelSouth.add(backButton);
         createPanel.add(panelSouth, BorderLayout.SOUTH);
 
-
         return createPanel;
+
     }
 
 
     public JPanel searchHotelPanel(){
         JPanel panel = new JPanel();
-        setLayout(new BorderLayout());
+        panel.setLayout(new BorderLayout());
 
         JPanel panelCenter = new JPanel();
         panelCenter.setLayout(new BoxLayout(panelCenter, BoxLayout.Y_AXIS));
+        panelCenter.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JLabel lblSearchName = new JLabel("Select Hotel: ");
-        panelCenter.add(lblSearchName);
-        panelCenter.add(cbHotelNames);
-
+        lblSearchName.setFont(new Font("Arial", Font.BOLD, 24));
+        lblSearchName.setHorizontalAlignment(SwingConstants.CENTER);
         searchHotelBtn = new JButton("Search Hotel");
+
+        panelCenter.add(lblSearchName);
+        panelCenter.add(Box.createVerticalStrut(10));
+        panelCenter.add(cbHotelNames);
+        panelCenter.add(Box.createVerticalStrut(10));
         panelCenter.add(searchHotelBtn);
 
         panel.add(panelCenter, BorderLayout.CENTER);
@@ -186,15 +222,11 @@ public class View extends JFrame {
         return panel;
     }
 
-    public JOptionPane confirmedDetails(){
-        JOptionPane pane = new JOptionPane();
-        pane.setMessageType(JOptionPane.INFORMATION_MESSAGE);
-
-
-
-        return pane;
+    // Helper method to center align labels
+    private void setFontAndStyle(JLabel label) {
+        label.setFont(new Font("Arial", Font.PLAIN, 16)); // Apply font style
+        label.setAlignmentX(Component.CENTER_ALIGNMENT); // Center alignment
     }
-
 
 
 
@@ -203,6 +235,7 @@ public class View extends JFrame {
         viewHotelBtn.addActionListener(listener);
         manageHotelBtn.addActionListener(listener);
         bookReservationBtn.addActionListener(listener);
+        exitBtn.addActionListener(listener);
         backButton.addActionListener(listener);
         addHotelBtn.addActionListener(listener);
         searchHotelBtn.addActionListener(listener);
@@ -250,5 +283,15 @@ public class View extends JFrame {
     }
     public void setCurrView(int currView) {
         this.currView = currView;
+    }
+    public JComboBox getCbHotelNames(){
+        return cbHotelNames;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        JOptionPane.showMessageDialog(this, errorMessage, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+    public void setConfirmMessage(String confirmMessage) {
+        JOptionPane.showMessageDialog(this, confirmMessage, "Confirm", JOptionPane.INFORMATION_MESSAGE);
     }
 }
