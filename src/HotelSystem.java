@@ -1,4 +1,3 @@
-import java.awt.datatransfer.StringSelection;
 import java.util.ArrayList;
 
 /** Represents a Hotel System
@@ -59,6 +58,7 @@ public class HotelSystem implements Discounts{
     /**
      * Assigns the name of a room to a new hotel
      * @param hotel specific hotel where a new room is made
+     * @param roomType type of room
      * @return name of room
      */
     public String assignRoomName(Hotel hotel, int roomType) {
@@ -96,6 +96,7 @@ public class HotelSystem implements Discounts{
      * @param hotel hotel to search in
      * @param checkInDate date of checkIn
      * @param checkOutDate date of checkOut
+     * @param roomType room type value
      * @return index of first vacant room
      */
     public int findVacantRoom(Hotel hotel, int checkInDate, int checkOutDate, int roomType) {
@@ -177,6 +178,12 @@ public class HotelSystem implements Discounts{
         return bookedRooms;
     }
 
+    /**
+     * Method to get information of room availability in a month
+     * @param hotel hotel selected
+     * @param roomIndex index of room in the hotel
+     * @return list of strings where every string is the availability in one date
+     */
     public ArrayList<String> getRoomDates(Hotel hotel, int roomIndex){
         ArrayList<String> dates = new ArrayList<>();
         Room room = hotel.getRooms().get(roomIndex);
@@ -189,6 +196,13 @@ public class HotelSystem implements Discounts{
         }
         return dates;
     }
+
+    /**
+     * Gets availability of all rooms in a hotel
+     * @param hotel hotel chosen
+     * @param roomType room type
+     * @return list of strings where every string is the availability in a date
+     */
     public ArrayList<String> getHotelDates(Hotel hotel, int roomType){
         ArrayList<String> dates = new ArrayList<>();
         int roomCount = 0;
@@ -243,10 +257,12 @@ public class HotelSystem implements Discounts{
     /**
      * Searches and displays specific reservation information
      * @param hotel hotel which will be checked
+     * @param guestName name of guest in reservation
+     * @return ArrayList of strings, including the price breakdown
      */
     public ArrayList<String> reservationInfo(Hotel hotel, String guestName){
         Reservation reservationInfo = null;
-        ArrayList<String> infoList = new ArrayList<>();
+        ArrayList<String> infoList;
         String roomType = "";
         String roomName;
         int checkInDate, checkOutDate;
@@ -284,6 +300,7 @@ public class HotelSystem implements Discounts{
      * Changes the name of a hotel
      * @param hotel hotel which will update its name
      * @param newHotelName new name of the hotel
+     * @return boolean value if successful
      */
     public boolean changeHotelName(Hotel hotel, String newHotelName) {
         if (searchHotel(newHotelName) == -1) { //checks if no hotel has the same name
@@ -302,6 +319,8 @@ public class HotelSystem implements Discounts{
      * Adds a new room to a hotel. nRooms is checked before calling, thus is assumed valid upon calling the method.
      * @param hotel hotel which a new room will be added
      * @param nRooms amount of rooms to add
+     * @param roomType room type
+     * @return boolean value if successful
      */
     public boolean addRoom(Hotel hotel, int nRooms, int roomType){
         int i;
@@ -338,6 +357,7 @@ public class HotelSystem implements Discounts{
      * Removes a room from a hotel
      * @param hotel hotel which a room will be removed
      * @param nRooms number of rooms to be removed
+     * @param roomType room type
      */
     public void removeRoom(Hotel hotel, int nRooms, int roomType) {
         int i;
@@ -381,33 +401,13 @@ public class HotelSystem implements Discounts{
                 }
             }
         }
-
-
-//        if (hotel.getRooms().size() == 1 && nRooms > 0)
-//            System.out.println("Cannot remove more rooms.\n"); //if no more rooms can be removed
-//
-//        for (i = hotel.getRooms().size() - 1; i > 0 && nRooms > 0; i--) {
-//            for (Reservation reservation : hotel.getReservations()) {
-//                if (reservation.getRoom().getRoomName().equals(hotel.getRooms().get(i).getRoomName())) {
-//                    isEmpty = false;    //checks if room has no reservation
-//                }
-//            }
-//            if (isEmpty) {
-//                System.out.println(hotel.getRooms().get(i).getRoomName() + " removed\n"); //confirmation message
-//                hotel.getRooms().remove(i);     //room is removed if empty
-//                nRooms--;
-//            }
-//
-//            if (i == 1 && nRooms > 0)
-//                System.out.println("Cannot remove more rooms.\n"); //if no more rooms can be removed
-//
-//        }
     }
 
     /**
      * Updates price of rooms in a hotel
      * @param hotel hotel to update room prices
      * @param newPrice newly set price to the rooms
+     * @return boolean value if successful
      */
     public boolean updatePrice(Hotel hotel, double newPrice){
         boolean validPrice = newPrice >= 100;
@@ -428,6 +428,14 @@ public class HotelSystem implements Discounts{
         return false;
     }
 
+    /**
+     * Changes the date modifier of a hotel
+     * @param hotel hotel chosen
+     * @param startDate start date for changing modifier
+     * @param endDate start date for changing modifier
+     * @param modifier value of date-price modifier
+     * @return boolean value if successful
+     */
     public boolean changeDateModifier(Hotel hotel, int startDate, int endDate, double modifier){
         boolean valid = (hotel.getReservations().isEmpty()) && (endDate > startDate);
 
@@ -442,10 +450,17 @@ public class HotelSystem implements Discounts{
         return false;
     }
 
+    /**
+     * Searches for a reservation given a specific name
+     * @param hotel hotel chosen
+     * @param guestName name of guest
+     * @param reservationInfo will store information of reservation
+     * @return boolean value if successful
+     */
     public boolean searchReservation(Hotel hotel, String guestName, ArrayList<String> reservationInfo){
         Reservation foundReservation = null;
-        int checkInDate = 0;
-        int checkOutDate = 0;
+        int checkInDate;
+        int checkOutDate;
         String roomType = "";
         String roomName;
         for(Reservation reservation : hotel.getReservations()) { //gets reservation information from guestName
@@ -479,6 +494,7 @@ public class HotelSystem implements Discounts{
      * Removes a reservation in a hotel
      * @param hotel hotel which will have a reservation removed
      * @param guestName name of guest under a reservation
+     * @return boolean value if successful
      */
     public boolean removeReservation(Hotel hotel, String guestName){
         int checkInDate = 0;
@@ -517,9 +533,14 @@ public class HotelSystem implements Discounts{
         hotels.remove(hotel); //hotel is removed from list
     }
 
-
-
-
+    /**
+     * Will return the price breakdown list of  a reservation
+     * @param hotel hotel chosen
+     * @param roomIndex index of room in hotel
+     * @param checkInDate check in date
+     * @param checkOutDate check out date
+     * @return list of strings which contains breakdown info
+     */
     public ArrayList<String> breakdownList(Hotel hotel, int roomIndex, int checkInDate, int checkOutDate){
         String roomItem;
         ArrayList<String> roomBreakList = new ArrayList<>();
@@ -541,6 +562,15 @@ public class HotelSystem implements Discounts{
         return roomBreakList;
     }
 
+    /**
+     * Will return the price breakdown list of  a reservation, given a discount code
+     * @param hotel hotel chosen
+     * @param roomIndex room index
+     * @param checkInDate check in date
+     * @param checkOutDate check out date
+     * @param discCode discount Code entered
+     * @return list of strings which contains breakdown info
+     */
     public ArrayList<String> breakdownList(Hotel hotel, int roomIndex, int checkInDate, int checkOutDate, String discCode){
         String roomItem;
         String discountMessage;
@@ -589,7 +619,14 @@ public class HotelSystem implements Discounts{
         return roomBreakList;
     }
 
-
+    /**
+     * Computes for the subtotal price of a reservation (without discount)
+     * @param hotel hotel chosen
+     * @param checkInDate checkin date
+     * @param checkOutDate checkout date
+     * @param roomIndex index of room in hotel
+     * @return subtotal price
+     */
     public double getSubtotal(Hotel hotel, int checkInDate, int checkOutDate, int roomIndex){
         double subtotal = 0;
 
@@ -599,6 +636,15 @@ public class HotelSystem implements Discounts{
         return subtotal;
     }
 
+    /**
+     * Computes for total price of a reservation (with a discount)
+     * @param hotel hotel chosen
+     * @param roomIndex index of room in hotel
+     * @param checkInDate check in date
+     * @param checkOutDate check out date
+     * @param discCode discount code
+     * @return computed total price of reservation
+     */
     public double getTotalPrice(Hotel hotel, int roomIndex, int checkInDate, int checkOutDate, String discCode){
         double subtotal, total;
         double lessDisc = 0;
@@ -641,16 +687,35 @@ public class HotelSystem implements Discounts{
         return hotels;
     }
 
+    /**
+     * discount computation of I_WORK_HERE
+     * @param price the initial subtotal price of a reservation
+     * @return less price
+     */
     public double iWorkHere(double price) {
         return price * 0.10;
     }
 
+    /**
+     * discount computation of  STAY4_GET1
+     * @param price the initial subtotal price of a reservation
+     * @param checkInDate checks if the stay is within the discount terms
+     * @param checkOutDate checks if the stay is within the discount terms
+     * @return less price
+     */
     public double stay4Get1(double price, int checkInDate, int checkOutDate) {
         if(checkOutDate - checkInDate >= 5)
             return price;
         return 0;
     }
 
+    /**
+     * discount computation for PAYDAY
+     * @param price the initial subtotal price of a reservation
+     * @param checkInDate checks if the stay is within the discount terms
+     * @param checkOutDate checks if the stay is within the discount terms
+     * @return less price
+     */
     public double payday(double price, int checkInDate, int checkOutDate) {
         if(inRange(15, checkInDate, checkOutDate - 1))
             return price * 0.07;

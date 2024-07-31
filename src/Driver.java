@@ -7,7 +7,6 @@ public class Driver {
         MainGUI gui = new MainGUI();
         Controller ctr = new Controller(gui, hotelSystem);
 
-        gui.setVisible(true);
 
     }
 }

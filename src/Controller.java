@@ -3,8 +3,6 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,53 +13,85 @@ import java.util.Locale;
  * @author Cumti
  * @author Escano
  * **/
-public class Controller implements ActionListener, DocumentListener, ItemListener {
+public class Controller implements ActionListener, DocumentListener {
+    /**
+     * represents the hotel system
+     */
     private HotelSystem hotelSystem;
+    /**
+     * represents the main GUI class
+     */
     private MainGUI mainGUI;
+    /**
+     * index of hotel in hotelSystem
+     */
     private int index;
+    /**
+     * index of booked Room chosen
+     */
     private int bookedRoomIndex;
+    /**
+     * check in date of chosen booked room
+     */
     private int bookedCheckInDate;
+    /**
+     * check out date of chosen booked roo
+     */
     private int bookedCheckOutDate;
+    /**
+     * breakdown list of reservation
+     */
     private ArrayList<String> breakdownList = new ArrayList<>();
 
+    /**
+     * Creates a controller class
+     * @param mainGUI the main gui class
+     * @param hotelSystem the hotelSystem
+     */
     public Controller(MainGUI mainGUI, HotelSystem hotelSystem) {
         this.mainGUI = mainGUI;
         this.hotelSystem = hotelSystem;
         mainGUI.setActionListener(this);
+        mainGUI.setVisible(true);
     }
 
+    /**
+     * Performs certain methods depending on the action event done in the GUI
+     * @param e the event to be processed
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         String command = e.getActionCommand();
 
         switch (command) {
+            //returning to main class
             case "Back":
                 mainGUI.getMainCardLayout().show(mainGUI.getMainCardPanel(), "main");
                 break;
-
+            //accessing createhotel panel
             case "Create Hotel":
                 mainGUI.getMainCardLayout().show(mainGUI.getMainCardPanel(), "create");
                 break;
-
+            //accessing ViewHotel panel
             case "View Hotel":
                 mainGUI.getMainCardLayout().show(mainGUI.getMainCardPanel(), "searchHotel");
                 mainGUI.setCurrView(2);
                 break;
-
+            //accessing ManageHotel panel
             case "Manage Hotel":
                 mainGUI.getMainCardLayout().show(mainGUI.getMainCardPanel(), "searchHotel");
                 mainGUI.setCurrView(3);
                 break;
-
+            //accessing Book Reservation panel
             case "Book Reservation":
                 mainGUI.getMainCardLayout().show(mainGUI.getMainCardPanel(), "bookReservation");
                 mainGUI.setCurrView(4);
                 break;
-
+            //Creates new hotel in system
             case "Add Hotel":
                 addHotel();
                 break;
-
+            //Searches which hotel to view or manage
             case "Search Hotel":
                 if (mainGUI.getCurrView() == 2) {
                     hiLevel();
@@ -70,27 +100,27 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
                     mainGUI.getManageHotelPanel().getManageCardLayout().show(mainGUI.getManageHotelPanel().getManagePanel(), "manageOptionPanel");
                 }
                 break;
-
+            //views ROD
             case "View Available Rooms on Date":
                 mainGUI.getViewHotelPanel().getViewHotelCardLayout().show(mainGUI.getViewHotelPanel().getViewPanel(), "roomsOnDate");
                 break;
-
+            //selects date for viewROD
             case "Select Date":
                 viewRoomsOnDate();
                 break;
-
+            //opens viewRoom info panel
             case "View Room Info":
                 mainGUI.getViewHotelPanel().getViewHotelCardLayout().show(mainGUI.getViewHotelPanel().getViewPanel(), "roomInfo");
                 break;
-
+            //button to select room to view
             case "Select Room":
                 viewRoomInfo();
                 break;
-
+            //views room information
             case "View Reservation Info":
                 mainGUI.getViewHotelPanel().getViewHotelCardLayout().show(mainGUI.getViewHotelPanel().getViewPanel(), "reservation");
                 break;
-
+            //button to find reservation
             case "Search Reservation":
                 if (mainGUI.getCurrView() == 2) {
                     viewReservationInfo();
@@ -98,24 +128,24 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
                     showBasicReservation();
                 }
                 break;
-
+            //to remove reservation
             case "Confirm Remove Reservation":
                 removeReservation();
                 break;
-
+            //to show change hotel name panel
             case "Change Name":
                 mainGUI.getManageHotelPanel().getManageCardLayout().show(mainGUI.getManageHotelPanel().getManagePanel(), "changeNamePanel");
                 break;
-
+            //to confirm hotel name change
             case "Confirm Name Change":
                 changeName();
                 break;
-
+            //shows panel to add room
             case "Add Room":
                 updateCbRmToAdd();
                 mainGUI.getManageHotelPanel().getManageCardLayout().show(mainGUI.getManageHotelPanel().getManagePanel(), "addRoomsPanel");
                 break;
-
+            //to confirm adding a room
             case "Confirm Add Room":
                 addRoom();
                 break;
@@ -123,81 +153,79 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
             case "Remove Room":
                 mainGUI.getManageHotelPanel().getManageCardLayout().show(mainGUI.getManageHotelPanel().getManagePanel(), "removeRoomsPanel");
                 break;
-
+            //shows panel to remove room
             case "Select Room Type":
                 updateCbRmToRemove();
                 break;
-
+            //to confirm to remove room
             case "Confirm Remove Room":
                 removeRoom();
                 break;
-
+            //shows panel to update base price
             case "Update Base Price":
                 mainGUI.getManageHotelPanel().getManageCardLayout().show(mainGUI.getManageHotelPanel().getManagePanel(), "updatePricePanel");
                 break;
-
+            //to confirm to price change
             case "Confirm Base Price":
                 updateBasePrice();
                 break;
-
+            //shows panel to update modifier
             case "Update Price Modifier":
                 mainGUI.getManageHotelPanel().getManageCardLayout().show(mainGUI.getManageHotelPanel().getManagePanel(), "updatePriceModPanel");
                 break;
-
+            //shows panel to remove reservation
             case "Remove Reservation":
                 mainGUI.getManageHotelPanel().getManageCardLayout().show(mainGUI.getManageHotelPanel().getManagePanel(), "removeReservationPanel");
                 break;
-
+            //shows panel to remove hotel
             case "Remove Hotel":
                 mainGUI.getManageHotelPanel().getManageCardLayout().show(mainGUI.getManageHotelPanel().getManagePanel(), "removeHotelPanel");
                 break;
-
+            //to confirm to remove hotel
             case "Confirm Remove Hotel":
                 removeHotel();
                 break;
-
+            //to confirm to update modifier
             case "Confirm Price Modifier":
                 updatePriceMod();
                 break;
-
+            //to proceed with booking
             case "Next":
                 if(validateBook())
                     updateConfirmInfo(bookedRoomIndex);
                 break;
-
+            //for searching available rooms
             case "Search for Rooms":
                 searchAvailRooms();
                 break;
-
+            //to finalize booking to system
             case "Confirm Booking":
                 confirmBook();
                 break;
-
+            //to cancel booking
             case "Cancel Booking":
                 cancelBook();
-
+            //to return to main panel
             case "Return to Main":
                 mainGUI.getBookReservationPanel().getBookReservationCardLayout().show(mainGUI.getBookReservationPanel().getBookReservationCard(), "promptPanel");
                 mainGUI.getMainCardLayout().show(mainGUI.getMainCardPanel(), "main");
                 break;
-
+            //to exit program
             case "Shutdown":
                 System.out.println("Program Shutting down");
                 System.exit(0);
                 break;
 
             default:
-                System.err.println("Unknown command: " + command);
+                System.out.println("Unknown command: " + command);
                 break;
         }
 
     }
 
-    @Override
-    public void itemStateChanged(ItemEvent e) {
-
-    }
-
+    /**
+     * Method to ask hotel system to add hotel
+     */
     public void addHotel(){
         if(mainGUI.getHotelName().equals(""))
             mainGUI.setErrorMessage("Please enter hotel name");
@@ -211,7 +239,9 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
             }
         }
     }
-
+    /**
+     * Method to show high level hotel info
+     */
     public void hiLevel(){
         index = hotelSystem.searchHotel(mainGUI.getCbHotelNames().getSelectedItem().toString());
         Hotel hotel = hotelSystem.getHotels().get(index);
@@ -221,7 +251,9 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
         mainGUI.getMainCardLayout().show(mainGUI.getMainCardPanel(), "viewHotel");
         mainGUI.getViewHotelPanel().getViewHotelCardLayout().show(mainGUI.getViewHotelPanel().getViewPanel(), "hiLevel");
     }
-
+    /**
+     * Method to view rooms on a date
+     */
     public void viewRoomsOnDate(){
         int bookedRooms, roomCount;
         int date;
@@ -238,7 +270,9 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
         line3 = "Available Rooms: " + (roomCount - bookedRooms);
         mainGUI.setConfirmMessage("Hotel Name: "+ hotel.getHotelName() + "\n" + line1 + "\n" + line2 + "\n" + line3);
     }
-
+    /**
+     * Method to view room info
+     */
     public void viewRoomInfo(){
         Hotel hotel = hotelSystem.getHotels().get(index);
         String roomName = mainGUI.getViewHotelPanel().getCbRoomNames().getSelectedItem().toString();
@@ -258,7 +292,9 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
 
         mainGUI.getViewHotelPanel().updateRoomInfo(roomName, roomType, roomPrice, dates);
     }
-
+    /**
+     * Method to view reservation info
+     */
     public void viewReservationInfo(){
         Hotel hotel = hotelSystem.getHotels().get(index);
         String guestName = mainGUI.getViewHotelPanel().getTfGuestName();
@@ -274,7 +310,9 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
          }
 
     }
-
+    /**
+     * Method to change hotel name
+     */
     public void changeName(){
         Hotel hotel = hotelSystem.getHotels().get(index);
         String newName = mainGUI.getManageHotelPanel().getTfNewName();
@@ -289,7 +327,9 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
         }
 
     }
-
+    /**
+     * Method to add a room to hotel
+     */
     public void addRoom(){
         Hotel hotel = hotelSystem.getHotels().get(index);
         String roomType = mainGUI.getManageHotelPanel().getCbRoomTypeAdd().getSelectedItem().toString();
@@ -312,7 +352,9 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
             mainGUI.setConfirmMessage(roomCount + " " + roomType + " Rooms Added");
         }
     }
-
+    /**
+     * Method to remove a room to hotel
+     */
     public void removeRoom(){
         Hotel hotel = hotelSystem.getHotels().get(index);
         int roomCount = 0;
@@ -332,10 +374,14 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
                 hotelSystem.removeRoom(hotel, roomCount, 2);
             else
                 hotelSystem.removeRoom(hotel, roomCount, 3);
+            mainGUI.setConfirmMessage(roomCount + " " + roomType + " Rooms Removed");
             updateCbRmToRemove();
         }
     }
 
+    /**
+     * Method to update base price of rooms in a hotel
+     */
     public void updateBasePrice(){
         Hotel hotel = hotelSystem.getHotels().get(index);
         double newPrice = 0;
@@ -353,7 +399,9 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
                 mainGUI.setConfirmMessage("Price updated to " + newPrice);
         }
     }
-
+    /**
+     * Method to update price modifier in a hotel
+     */
     public void updatePriceMod(){
         Hotel hotel = hotelSystem.getHotels().get(index);
         int startDate = (int) mainGUI.getManageHotelPanel().getCbStartDateMod().getSelectedItem();
@@ -376,6 +424,9 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
         }
 
     }
+    /**
+     * Method to show basic reservation info in a hotel. (for removing reservation)
+     */
     public void showBasicReservation(){
         Hotel hotel = hotelSystem.getHotels().get(index);
         ArrayList<String> reservationInfo = new ArrayList<>();
@@ -386,7 +437,9 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
         else
             mainGUI.getManageHotelPanel().updateRsrvPanel();
     }
-
+    /**
+     * Method for removing a reservation
+     */
     public void removeReservation(){
         Hotel hotel = hotelSystem.getHotels().get(index);
         String guestName = mainGUI.getManageHotelPanel().getTfGuestName();
@@ -395,7 +448,9 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
         else
             mainGUI.setConfirmMessage("Reservation by " + guestName + " Removed");
     }
-
+    /**
+     * Method for removing a hotel
+     */
     public void removeHotel(){
         Hotel hotel = hotelSystem.getHotels().get(index);
         hotelSystem.removeHotel(hotel);
@@ -403,8 +458,9 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
         updateCbHotels();
     }
 
-
-
+    /**
+     * Method to update list of hotels in a system to GUI
+     */
     public void updateCbHotels(){
         mainGUI.getCbHotelNames().removeAllItems();
         mainGUI.getBookReservationPanel().getCbHotels().removeAllItems();
@@ -413,7 +469,9 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
             mainGUI.getBookReservationPanel().getCbHotels().addItem(hotel.getHotelName());
         }
     }
-
+    /**
+     * Method to update list of hotel rooms in a system to GUI
+     */
     public void updateCbRooms(){
         ArrayList<String> roomList = new ArrayList<>();
         Hotel hotel = hotelSystem.getHotels().get(index);
@@ -430,7 +488,9 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
         }
     }
 
-
+    /**
+     * Method to update list of rooms that can be added to a hotel
+     */
     public void updateCbRmToAdd(){
         mainGUI.getManageHotelPanel().getCbRmToAdd().removeAllItems();
         Hotel hotel = hotelSystem.getHotels().get(index);
@@ -438,7 +498,9 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
             mainGUI.getManageHotelPanel().getCbRmToAdd().addItem(i);
         }
     }
-
+    /**
+     * Method to update list of rooms that can be removed from a hotel
+     */
     public void updateCbRmToRemove(){
         Hotel hotel = hotelSystem.getHotels().get(index);
         String roomType = mainGUI.getManageHotelPanel().getCbRoomTypeRemove().getSelectedItem().toString();
@@ -472,6 +534,9 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
         mainGUI.getManageHotelPanel().getManageCardLayout().show(mainGUI.getManageHotelPanel().getManagePanel(), "removeRoom");
     }
 
+    /**
+     * searches for room availability
+     */
     public void searchAvailRooms(){
         Hotel hotel = null;
         String roomType = mainGUI.getBookReservationPanel().getCbRoomTypes().getSelectedItem().toString();
@@ -495,6 +560,10 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
         }
     }
 
+    /**
+     * method to validate booking info based on user input
+     * @return boolean value if successful
+     */
     public boolean validateBook(){
         Hotel hotel;
         int checkInDate = (int) mainGUI.getBookReservationPanel().getCbCheckIn().getSelectedItem();
@@ -537,6 +606,10 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
         return false;
     }
 
+    /**
+     * to update confirmation information for booking
+     * @param bookedIndex booked room index
+     */
     public void updateConfirmInfo(int bookedIndex){
         breakdownList.clear();
         Hotel hotel = hotelSystem.getHotels().get(index);
@@ -554,6 +627,9 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
         mainGUI.getBookReservationPanel().getBookReservationCardLayout().show(mainGUI.getBookReservationPanel().getBookReservationCard(), "confirmPanel");
     }
 
+    /**
+     * Submits booking information to hotelSystem
+     */
     public void confirmBook(){
         Hotel hotel = hotelSystem.getHotels().get(index);
         bookedCheckInDate = (int) mainGUI.getBookReservationPanel().getCbCheckIn().getSelectedItem();
@@ -570,6 +646,9 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
         mainGUI.getBookReservationPanel().getBookReservationCardLayout().show(mainGUI.getBookReservationPanel().getBookReservationCard(), "promptPanel");
     }
 
+    /**
+     * Cancels booking process. Deletes inputted info
+     */
     public void cancelBook(){
         mainGUI.setConfirmMessage("Booking Cancelled");
         mainGUI.getBookReservationPanel().setTfGuestName("");
@@ -577,8 +656,6 @@ public class Controller implements ActionListener, DocumentListener, ItemListene
         mainGUI.getBookReservationPanel().getCalendarPanel().setVisible(false);
         mainGUI.getBookReservationPanel().getBookReservationCardLayout().show(mainGUI.getBookReservationPanel().getBookReservationCard(), "promptPanel");
     }
-
-
 
 
     @Override

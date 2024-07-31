@@ -78,11 +78,7 @@ public class BookReservationPanel extends JPanel {
     private JScrollPane datesScroller;
 
     /**
-     * chosen index of a room
-     */
-    private int roomIndex;
-    /**
-     * Arraylist of JLabels containigg the price breakdown
+     * Arraylist of JLabels containig the price breakdown
      */
     private ArrayList<JLabel> priceBreakdown;
     /**
@@ -226,7 +222,7 @@ public class BookReservationPanel extends JPanel {
         datesAvailPanel = new JPanel();
         datesAvailPanel.setLayout(new BoxLayout(datesAvailPanel, BoxLayout.Y_AXIS));
         datesScroller = new JScrollPane(datesAvailPanel);
-        datesScroller.setPreferredSize(new Dimension(400, 100));  // Adjusted size
+        datesScroller.setPreferredSize(new Dimension(400, 100));
         calendarPanel.add(datesScroller);
         calendarPanel.setVisible(false);
         panel.add(calendarPanel, BorderLayout.CENTER);
@@ -340,8 +336,8 @@ public class BookReservationPanel extends JPanel {
     }
 
     /**
-     *
-     * @return
+     * JPanel which contains the ArrayList of JLabels from priceBreakDown
+     * @return JPanel stores all the JLabels in one panel
      */
     public JPanel breakDownPanel(){
         JPanel panel = new JPanel();
@@ -352,6 +348,9 @@ public class BookReservationPanel extends JPanel {
         return panel;
     }
 
+    /**
+     * Method to store and refresh the information to the Confirmation panel
+     */
     private void refreshConfirmPanel() {
         infoPanel.removeAll();
         infoPanel.add(infoPanel());
@@ -361,8 +360,10 @@ public class BookReservationPanel extends JPanel {
         bookReservationCard.add(confirmPanel, "confirmPanel");
     }
 
-
-
+    /**
+     * ActionListeners for all JButtons and JComboButtons
+     * @param actionListener action listener based on action performed
+     */
     public void setActionListener(ActionListener actionListener) {
         cbHotels.addActionListener(actionListener);
         cbRoomTypes.addActionListener(actionListener);
@@ -373,52 +374,96 @@ public class BookReservationPanel extends JPanel {
         cancelBookBtn.addActionListener(actionListener);
         confirmBookBtn.addActionListener(actionListener);
     }
+
+    /**
+     * Document listener for Text fields
+     * @param documentListener document listener
+     */
     public void setDocumentListener(DocumentListener documentListener) {
         tfGuestNameField.getDocument().addDocumentListener(documentListener);
         tfDiscountCode.getDocument().addDocumentListener(documentListener);
     }
 
+    /**
+     * Getter method for the BookReservationCardLayout
+     * @return bookReservationCardLayout the card layout of the class
+     */
     public CardLayout getBookReservationCardLayout() {
         return bookReservationCardLayout;
     }
+    /**
+     * Getter method for the BookReservationCard
+     * @return bookReservationCard the main card panel of the class
+     */
     public JPanel getBookReservationCard() {
         return bookReservationCard;
     }
+    /**
+     * Getter method for calendarPanel
+     * @return JPanel stored in calendarPanel
+     */
+    public JPanel getCalendarPanel(){
+        return calendarPanel;
+    }
+
+    /**
+     * Getter method for cbHotels
+     * @return cbHotels list of hotels in the system
+     */
     public JComboBox<String> getCbHotels(){
         return cbHotels;
     }
+    /**
+     * Getter method for cbRoomTypes
+     * @return cbRoomTypes JCombobox of all room types
+     */
     public JComboBox<String> getCbRoomTypes(){
         return cbRoomTypes;
     }
+
+    /**
+     * Getter method for cbCheckin
+     * @return cbCheckIn checkInDate choices
+     */
     public JComboBox<Integer> getCbCheckIn(){
         return cbCheckIn;
     }
+    /**
+     * Getter method for cbCheckOut
+     * @return cbCheckOut checkOut date choices
+     */
     public JComboBox<Integer> getCbCheckOut(){
         return cbCheckOut;
     }
-    public int getRoomIndex() {
-        return roomIndex;
-    }
-    public void setRoomIndex(int roomIndex) {
-        this.roomIndex = roomIndex;
-    }
+
+    /**
+     * getter method for tfGuestName as a string
+     * @return String which is entered on the text field
+     */
     public String getTfGuestName() {
         return tfGuestNameField.getText();
     }
+    /**
+     * getter method for tfDiscountCode as a string
+     * @return String which is entered on the text field
+     */
     public String getTfDiscountCode() {
         return tfDiscountCode.getText();
     }
+    /**
+     * setter method for tfGuestName
+     * @param tfGuestName string, mainly used to reset/clear the text field
+     */
     public void setTfGuestName(String tfGuestName) {
         this.tfGuestNameField.setText(tfGuestName);
     }
+    /**
+     * setter method for tfDiscountCode
+     * @param tfDiscountCode string, mainly used to reset/clear the text field
+     */
     public void setTfDiscountCode(String tfDiscountCode) {
         this.tfDiscountCode.setText(tfDiscountCode);
     }
 
-    public void setRoomName(String roomName) {
-        this.roomName.setText("Your room is: " + roomName);
-    }
-    public JPanel getCalendarPanel(){
-        return calendarPanel;
-    }
+
 }
